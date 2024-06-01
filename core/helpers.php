@@ -2,6 +2,19 @@
 
 declare(strict_types=1);
 
+if (!function_exists('config')) {
+    /**
+     * Get the config value based on name.
+     *
+     * @param string $name
+     * @return mixed
+     */
+    function config(string $name)
+    {
+        return Booking\Config::getInstance()->get($name);
+    }
+}
+
 if (!function_exists('dd')) {
     /**
      * Dump the passed variables and end the script.
