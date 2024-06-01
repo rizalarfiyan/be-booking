@@ -1,0 +1,28 @@
+{
+  "name": "rizalarfiyan/be-booking",
+  "description": "Backend for Booking Apps",
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/",
+      "Booking\\": "core/"
+    },
+    "files": [
+      "core/helpers.php"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Muhamad Rizal Arfiyan",
+      "email": "rizal.arfiyan.23@gmail.com"
+    }
+  ],
+  "config": {
+    "optimize-autoloader": true
+  },
+  "require-dev": {
+    "symfony/var-dumper": "^7.1"
+  },
+  "require": {
+    "ext-json": "*"
+  }
+}
