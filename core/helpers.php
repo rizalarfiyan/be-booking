@@ -2,18 +2,34 @@
 
 declare(strict_types=1);
 
+use JetBrains\PhpStorm\NoReturn;
+
 if (!function_exists('config')) {
     /**
      * Get the config value based on name.
      *
      * @param string $name
+     * @param null $default
      * @return mixed
      */
-    function config(string $name)
+    function config(string $name, $default = null): mixed
     {
-        return Booking\Config::getInstance()->get($name);
+        return Booking\Config::getInstance()->get($name, $default);
     }
 }
+
+if (!function_exists('is_production')) {
+    /**
+     * Get the config value based on name.
+     *
+     * @return boolean
+     */
+    function is_production(): bool
+    {
+        return (bool) config('app.env') == 'production';
+    }
+}
+
 
 if (!function_exists('dd')) {
     /**
@@ -22,7 +38,7 @@ if (!function_exists('dd')) {
      * @param mixed $args
      * @return void
      */
-    function dd(...$args)
+    #[NoReturn] function dd(...$args): void
     {
         http_response_code(500);
 
@@ -41,7 +57,7 @@ if (!function_exists('bootstrapError')) {
      * @param Throwable $t
      * @return void
      */
-    function bootstrapError(Throwable $t)
+    #[NoReturn] function bootstrapError(Throwable $t): void
     {
         $data = [
             'type' => get_class($t),
@@ -63,7 +79,7 @@ if (!function_exists('errorLog')) {
      * @param Throwable $t
      * @return void
      */
-    function errorLog(Throwable $t)
+    function errorLog(Throwable $t): void
     {
         $message = sprintf(
             "[%s] Exception: %s\nTrace:\n%s",
@@ -84,7 +100,7 @@ if (!function_exists('infoLog')) {
      * @param string $message
      * @return void
      */
-    function infoLog(string $message)
+    function infoLog(string $message): void
     {
         $message = sprintf(
             '[%s] Log: %s',

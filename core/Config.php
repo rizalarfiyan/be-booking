@@ -13,10 +13,10 @@ class Config
     const PATH = __DIR__ . '/../config';
 
     /** @var Config */
-    private static $instance;
+    private static Config $instance;
 
     /** @var array */
-    private static $data = [];
+    private static array $data = [];
 
     /**
      * @return Config
@@ -33,11 +33,11 @@ class Config
     /**
      * Get the value of config.
      *
-     * @param  mixed $key
-     * @param  mixed $default
+     * @param  string $key
+     * @param mixed|null $default
      * @return mixed
      */
-    public static function get($key, $default = null)
+    public static function get(string $key, mixed $default = null): mixed
     {
         if (!self::$data) {
             self::$instance->loadData();
@@ -60,7 +60,7 @@ class Config
     /**
      * @return void
      */
-    private function loadData()
+    private function loadData(): void
     {
         $iterator = new DirectoryIterator(realpath(self::PATH));
         foreach ($iterator as $fileInfo) {
