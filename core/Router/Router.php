@@ -14,7 +14,7 @@ class Router
     const ROUTES_FILE = __DIR__ . '/../../routes/api.php';
 
     /**  @var ?RouteCollector */
-    private ?RouteCollector $collector;
+    private ?RouteCollector $collector = null;
 
     /**
      * @param ?string $routes
