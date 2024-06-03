@@ -15,7 +15,6 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Throwable;
 
-
 class Application
 {
     /** @var ContainerInterface */
@@ -40,7 +39,7 @@ class Application
     }
 
     /**
-     * Run the application and emit the response
+     * Run the application and emit the response.
      *
      * @return void
      * @throws ContainerExceptionInterface
@@ -81,7 +80,7 @@ class Application
     }
 
     /**
-     * Make the DI container
+     * Make the DI container.
      *
      * @return ContainerInterface
      * @throws Exception

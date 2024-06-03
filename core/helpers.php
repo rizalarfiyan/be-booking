@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use JetBrains\PhpStorm\NoReturn;
 use Booking\Config;
 use Cake\Chronos\Chronos;
 use Cake\Chronos\ChronosDate;
 use Cake\Chronos\ChronosTime;
+use JetBrains\PhpStorm\NoReturn;
 
-if (!function_exists('config')) {
+if (! function_exists('config')) {
     /**
      * Get the config value based on name.
      *
@@ -22,7 +22,7 @@ if (!function_exists('config')) {
     }
 }
 
-if (!function_exists('datetime')) {
+if (! function_exists('datetime')) {
     /**
      * Get the time with chronos library using paramter.
      *
@@ -30,27 +30,27 @@ if (!function_exists('datetime')) {
      * @param DateTimeZone|string|null $timezone
      * @return Chronos
      */
-    function datetime(ChronosDate|ChronosTime|DateTimeInterface|string|int|null $time = 'now',
-                     DateTimeZone|string|null                                  $timezone = null): Chronos
-    {
+    function datetime(
+        ChronosDate|ChronosTime|DateTimeInterface|string|int|null $time = 'now',
+        DateTimeZone|string|null $timezone = null
+    ): Chronos {
         return new Chronos($time, $timezone);
     }
 }
 
-if (!function_exists('is_production')) {
+if (! function_exists('is_production')) {
     /**
      * Get the config value based on name.
      *
-     * @return boolean
+     * @return bool
      */
     function is_production(): bool
     {
-        return (bool)config('app.env') == 'production';
+        return (bool) config('app.env') == 'production';
     }
 }
 
-
-if (!function_exists('dd')) {
+if (! function_exists('dd')) {
     /**
      * Dump the passed variables and end the script.
      *
@@ -69,7 +69,7 @@ if (!function_exists('dd')) {
     }
 }
 
-if (!function_exists('bootstrapError')) {
+if (! function_exists('bootstrapError')) {
     /**
      * Returns a json in case bootstrap error.
      *
@@ -91,7 +91,7 @@ if (!function_exists('bootstrapError')) {
     }
 }
 
-if (!function_exists('errorLog')) {
+if (! function_exists('errorLog')) {
     /**
      * A simple logger to use in application bootstrap.
      *
@@ -107,12 +107,12 @@ if (!function_exists('errorLog')) {
             $t->getTraceAsString()
         );
 
-        $file = __DIR__ . '/../log/errors.log';
-        file_put_contents($file, $message . PHP_EOL, FILE_APPEND | LOCK_EX);
+        $file = __DIR__.'/../log/errors.log';
+        file_put_contents($file, $message.PHP_EOL, FILE_APPEND | LOCK_EX);
     }
 }
 
-if (!function_exists('infoLog')) {
+if (! function_exists('infoLog')) {
     /**
      * A simple logger to use in application bootstrap.
      *
@@ -127,7 +127,7 @@ if (!function_exists('infoLog')) {
             $message
         );
 
-        $file = __DIR__ . '/../log/info.log';
-        file_put_contents($file, $message . PHP_EOL, FILE_APPEND | LOCK_EX);
+        $file = __DIR__.'/../log/info.log';
+        file_put_contents($file, $message.PHP_EOL, FILE_APPEND | LOCK_EX);
     }
 }

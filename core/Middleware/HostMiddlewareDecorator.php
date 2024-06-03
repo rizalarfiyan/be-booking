@@ -19,7 +19,7 @@ final class HostMiddlewareDecorator implements MiddlewareInterface
     /** @var MiddlewareInterface */
     private MiddlewareInterface $middleware;
 
-    /** @var string Host name under which the middleware is segregated.  */
+    /** @var string Host name under which the middleware is segregated. */
     private string $host;
 
     public function __construct(string $host, MiddlewareInterface $middleware)

@@ -20,11 +20,12 @@ class Response implements ResponseInterface
 {
     use MessageTrait;
 
-    const MIN_STATUS_CODE_VALUE = 100;
-    const MAX_STATUS_CODE_VALUE = 599;
+    public const MIN_STATUS_CODE_VALUE = 100;
+
+    public const MAX_STATUS_CODE_VALUE = 599;
 
     /**
-     * Map of standard HTTP status code/reason phrases
+     * Map of standard HTTP status code/reason phrases.
      *
      * @var array
      */
@@ -126,7 +127,7 @@ class Response implements ResponseInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getStatusCode() : int
     {
@@ -134,7 +135,7 @@ class Response implements ResponseInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getReasonPhrase() : string
     {
@@ -142,12 +143,13 @@ class Response implements ResponseInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function withStatus($code, $reasonPhrase = '') : Response
+    public function withStatus($code, $reasonPhrase = '') : self
     {
         $new = clone $this;
         $new->setStatusCode($code, $reasonPhrase);
+
         return $new;
     }
 

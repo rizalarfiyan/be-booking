@@ -26,7 +26,7 @@ class RouteProcessor implements MiddlewareInterface
     public function __construct(ContainerInterface $container, array $routes)
     {
         $this->container = $container;
-        $this->routes    = $routes;
+        $this->routes = $routes;
     }
 
     /**

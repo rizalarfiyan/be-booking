@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace Booking\Exception;
 
-use UnexpectedValueException;
 use Booking\Middleware\DoublePassMiddlewareDecorator;
+use UnexpectedValueException;
 
 /**
  * Exception thrown by the DoublePassMiddlewareDecorator when no response
@@ -22,7 +22,7 @@ class MissingResponsePrototypeException extends UnexpectedValueException impleme
     {
         return new self(sprintf(
             'Unable to create a %s instance; no response prototype provided,'
-            . ' and zendframework/zend-diactoros is not installed',
+            .' and zendframework/zend-diactoros is not installed',
             DoublePassMiddlewareDecorator::class
         ));
     }

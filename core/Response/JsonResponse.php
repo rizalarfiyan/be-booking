@@ -34,7 +34,7 @@ class JsonResponse extends Response
      *
      * @const int
      */
-    const DEFAULT_JSON_FLAGS = 79;
+    public const DEFAULT_JSON_FLAGS = 79;
 
     /**
      * @var mixed
@@ -66,11 +66,10 @@ class JsonResponse extends Response
      */
     public function __construct(
         mixed $data,
-        int   $status = 200,
+        int $status = 200,
         array $headers = [],
-        int   $encodingOptions = self::DEFAULT_JSON_FLAGS
-    )
-    {
+        int $encodingOptions = self::DEFAULT_JSON_FLAGS
+    ) {
         $this->setPayload($data);
         $this->encodingOptions = $encodingOptions;
 
@@ -94,10 +93,11 @@ class JsonResponse extends Response
      * @param mixed $data
      * @return JsonResponse
      */
-    public function withPayload(mixed $data): JsonResponse
+    public function withPayload(mixed $data): self
     {
         $new = clone $this;
         $new->setPayload($data);
+
         return $this->updateBodyFor($new);
     }
 
@@ -113,10 +113,11 @@ class JsonResponse extends Response
      * @param int $encodingOptions
      * @return JsonResponse
      */
-    public function withEncodingOptions(int $encodingOptions): JsonResponse
+    public function withEncodingOptions(int $encodingOptions): self
     {
         $new = clone $this;
         $new->encodingOptions = $encodingOptions;
+
         return $this->updateBodyFor($new);
     }
 
@@ -180,10 +181,11 @@ class JsonResponse extends Response
      * @param self $toUpdate Instance to update.
      * @return JsonResponse Returns a new instance with an updated body.
      */
-    private function updateBodyFor(JsonResponse $toUpdate): JsonResponse
+    private function updateBodyFor(self $toUpdate): self
     {
         $json = $this->jsonEncode($toUpdate->payload, $toUpdate->encodingOptions);
         $body = $this->createBodyFromJson($json);
+
         return $toUpdate->withBody($body);
     }
 }

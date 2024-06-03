@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Booking\Stream;
 
 /**
- * Caching version of php://input
+ * Caching version of php://input.
  */
 class PhpInputStream extends Stream
 {
@@ -33,7 +33,7 @@ class PhpInputStream extends Stream
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function __toString() : string
     {
@@ -42,11 +42,12 @@ class PhpInputStream extends Stream
         }
 
         $this->getContents();
+
         return $this->cache;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function isWritable() : bool
     {
@@ -54,7 +55,7 @@ class PhpInputStream extends Stream
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function read($length) : string
     {
@@ -71,7 +72,7 @@ class PhpInputStream extends Stream
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getContents($maxLength = -1) : string
     {
@@ -79,7 +80,7 @@ class PhpInputStream extends Stream
             return $this->cache;
         }
 
-        $contents     = stream_get_contents($this->resource, $maxLength);
+        $contents = stream_get_contents($this->resource, $maxLength);
         $this->cache .= $contents;
 
         if ($maxLength === -1 || $this->eof()) {

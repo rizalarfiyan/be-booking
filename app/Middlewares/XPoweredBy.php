@@ -16,7 +16,7 @@ class XPoweredBy implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $response  = $handler->handle($request);
+        $response = $handler->handle($request);
 
         return $response->withHeader('X-Powered-By', 'Api Booking Apps');
     }

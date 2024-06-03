@@ -13,7 +13,7 @@ use Psr\Http\Message\ResponseInterface;
 use Throwable;
 
 /**
- * Utility methods
+ * Utility methods.
  */
 abstract class Utils
 {
@@ -37,6 +37,7 @@ abstract class Utils
         if (! $status || $status < 400 || $status >= 600) {
             $status = 500;
         }
+
         return $status;
     }
 }

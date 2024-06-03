@@ -9,9 +9,8 @@ declare(strict_types=1);
 
 namespace Booking\Exception;
 
-use UnexpectedValueException;
-
 use function sprintf;
+use UnexpectedValueException;
 
 class UnrecognizedProtocolVersionException extends UnexpectedValueException implements ThrowableInterface
 {

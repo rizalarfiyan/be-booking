@@ -38,7 +38,7 @@ final class Next implements RequestHandlerInterface
      */
     public function __construct(SplQueue $queue, RequestHandlerInterface $fallbackHandler)
     {
-        $this->queue           = clone $queue;
+        $this->queue = clone $queue;
         $this->fallbackHandler = $fallbackHandler;
     }
 
@@ -50,6 +50,7 @@ final class Next implements RequestHandlerInterface
 
         if ($this->queue->isEmpty()) {
             $this->queue = null;
+
             return $this->fallbackHandler->handle($request);
         }
 

@@ -67,7 +67,7 @@ trait RequestTrait
             $this->setMethod($method);
         }
 
-        $this->uri    = $this->createUri($uri);
+        $this->uri = $this->createUri($uri);
         $this->stream = $this->getStream($body, 'wb+');
 
         $this->setHeaders($headers);
@@ -133,7 +133,7 @@ trait RequestTrait
 
         $target = $this->uri->getPath();
         if ($this->uri->getQuery()) {
-            $target .= '?' . $this->uri->getQuery();
+            $target .= '?'.$this->uri->getQuery();
         }
 
         if (empty($target)) {
@@ -170,6 +170,7 @@ trait RequestTrait
 
         $new = clone $this;
         $new->requestTarget = $requestTarget;
+
         return $new;
     }
 
@@ -201,6 +202,7 @@ trait RequestTrait
     {
         $new = clone $this;
         $new->setMethod($method);
+
         return $new;
     }
 
@@ -257,7 +259,7 @@ trait RequestTrait
 
         $host = $uri->getHost();
         if ($uri->getPort()) {
-            $host .= ':' . $uri->getPort();
+            $host .= ':'.$uri->getPort();
         }
 
         $new->headerNames['host'] = 'Host';
@@ -277,7 +279,7 @@ trait RequestTrait
     }
 
     /**
-     * Set and validate the HTTP method
+     * Set and validate the HTTP method.
      *
      * @param string $method
      * @throws InvalidArgumentException on invalid HTTP method.
@@ -301,12 +303,13 @@ trait RequestTrait
     }
 
     /**
-     * Retrieve the host from the URI instance
+     * Retrieve the host from the URI instance.
      */
     private function getHostFromUri() : string
     {
-        $host  = $this->uri->getHost();
-        $host .= $this->uri->getPort() ? ':' . $this->uri->getPort() : '';
+        $host = $this->uri->getHost();
+        $host .= $this->uri->getPort() ? ':'.$this->uri->getPort() : '';
+
         return $host;
     }
 }

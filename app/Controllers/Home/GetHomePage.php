@@ -12,7 +12,7 @@ use Psr\Http\Message\ServerRequestInterface;
 class GetHomePage extends Controller
 {
     /**
-     * Get Home Page Api
+     * Get Home Page Api.
      *
      * @param ServerRequestInterface $req
      * @param UserRepository $userRepository
@@ -27,8 +27,8 @@ class GetHomePage extends Controller
                 'size' => $this->getPageSize($req),
                 'users' => collect($userRepository->getAll())->map(function ($user) {
                     return collect($user)->only(['id', 'name', 'email', 'created_at', 'updated_at']);
-                })
-            ]
+                }),
+            ],
         ];
 
         return $this->json($res);

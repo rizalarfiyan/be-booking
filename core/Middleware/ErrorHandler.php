@@ -156,6 +156,7 @@ class ErrorHandler implements MiddlewareInterface
         $generator = $this->responseGenerator;
         $response = $generator($e, $request, ($this->responseFactory)());
         $this->triggerListeners($e, $request, $response);
+
         return $response;
     }
 
@@ -166,7 +167,7 @@ class ErrorHandler implements MiddlewareInterface
      */
     private function createErrorHandler() : callable
     {
-        /**
+        /*
          * @throws ErrorException if error is not within the error_reporting mask.
          */
         return function (int $errno, string $errStr, string $errFile, int $errLine) : void {

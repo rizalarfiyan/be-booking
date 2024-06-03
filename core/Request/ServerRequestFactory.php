@@ -56,7 +56,7 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
             $server ?: $_SERVER,
             is_callable(self::$apacheRequestHeaders) ? self::$apacheRequestHeaders : null
         );
-        $files   = normalizeUploadedFiles($files ?: $_FILES);
+        $files = normalizeUploadedFiles($files ?: $_FILES);
         $headers = marshalHeadersFromSapi($server);
 
         if (null === $cookies && array_key_exists('cookie', $headers)) {
@@ -78,7 +78,7 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function createServerRequest(string $method, $uri, array $serverParams = []) : ServerRequestInterface
     {

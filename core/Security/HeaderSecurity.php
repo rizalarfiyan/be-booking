@@ -31,7 +31,7 @@ final class HeaderSecurity
     }
 
     /**
-     * Filter a header value
+     * Filter a header value.
      *
      * Ensures CRLF header injection vectors are filtered.
      *
@@ -46,7 +46,7 @@ final class HeaderSecurity
      */
     public static function filter(string $value): string
     {
-        $value = (string)$value;
+        $value = (string) $value;
         $length = strlen($value);
         $string = '';
         for ($i = 0; $i < $length; $i += 1) {
@@ -57,7 +57,7 @@ final class HeaderSecurity
                 $lf = ord($value[$i + 1]);
                 $ws = ord($value[$i + 2]);
                 if ($lf === 10 && in_array($ws, [9, 32], true)) {
-                    $string .= $value[$i] . $value[$i + 1];
+                    $string .= $value[$i].$value[$i + 1];
                     $i += 1;
                 }
 
@@ -94,7 +94,7 @@ final class HeaderSecurity
      */
     public static function isValid($value): bool
     {
-        $value = (string)$value;
+        $value = (string) $value;
 
         // Look for:
         // \n not preceded by \r, OR
@@ -126,13 +126,13 @@ final class HeaderSecurity
      */
     public static function assertValid($value)
     {
-        if (!is_string($value) && !is_numeric($value)) {
+        if (! is_string($value) && ! is_numeric($value)) {
             throw new InvalidArgumentException(sprintf(
                 'Invalid header value type; must be a string or numeric; received %s',
                 (is_object($value) ? get_class($value) : gettype($value))
             ));
         }
-        if (!self::isValid($value)) {
+        if (! self::isValid($value)) {
             throw new InvalidArgumentException(sprintf(
                 '"%s" is not valid header value',
                 $value
@@ -149,13 +149,13 @@ final class HeaderSecurity
      */
     public static function assertValidName($name)
     {
-        if (!is_string($name)) {
+        if (! is_string($name)) {
             throw new InvalidArgumentException(sprintf(
                 'Invalid header name type; expected string; received %s',
                 (is_object($name) ? get_class($name) : gettype($name))
             ));
         }
-        if (!preg_match('/^[a-zA-Z0-9\'`#$%&*+.^_|~!-]+$/', $name)) {
+        if (! preg_match('/^[a-zA-Z0-9\'`#$%&*+.^_|~!-]+$/', $name)) {
             throw new InvalidArgumentException(sprintf(
                 '"%s" is not valid header name',
                 $name

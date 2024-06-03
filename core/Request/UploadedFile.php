@@ -13,10 +13,9 @@ use Booking\Exception\UploadedFileAlreadyMovedException;
 use Booking\Exception\UploadedFileErrorException;
 use Booking\Stream\Stream;
 use http\Exception\InvalidArgumentException;
+use const PHP_SAPI;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
-
-use const PHP_SAPI;
 use const UPLOAD_ERR_CANT_WRITE;
 use const UPLOAD_ERR_EXTENSION;
 use const UPLOAD_ERR_FORM_SIZE;
@@ -28,11 +27,11 @@ use const UPLOAD_ERR_PARTIAL;
 
 class UploadedFile implements UploadedFileInterface
 {
-    const ERROR_MESSAGES = [
+    public const ERROR_MESSAGES = [
         UPLOAD_ERR_OK         => 'There is no error, the file uploaded with success',
         UPLOAD_ERR_INI_SIZE   => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
         UPLOAD_ERR_FORM_SIZE  => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was '
-            . 'specified in the HTML form',
+            .'specified in the HTML form',
         UPLOAD_ERR_PARTIAL    => 'The uploaded file was only partially uploaded',
         UPLOAD_ERR_NO_FILE    => 'No file was uploaded',
         UPLOAD_ERR_NO_TMP_DIR => 'Missing a temporary folder',
@@ -120,7 +119,7 @@ class UploadedFile implements UploadedFileInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      * @throws UploadedFileAlreadyMovedException if the upload was
      *     not successful.
      */
@@ -141,11 +140,12 @@ class UploadedFile implements UploadedFileInterface
         }
 
         $this->stream = new Stream($this->file);
+
         return $this->stream;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @see http://php.net/is_uploaded_file
      * @see http://php.net/move_uploaded_file
@@ -180,7 +180,7 @@ class UploadedFile implements UploadedFileInterface
 
         $sapi = PHP_SAPI;
         switch (true) {
-            case (empty($sapi) || str_starts_with($sapi, 'cli') || str_starts_with($sapi, 'phpdbg') || ! $this->file):
+            case empty($sapi) || str_starts_with($sapi, 'cli') || str_starts_with($sapi, 'phpdbg') || ! $this->file:
                 // Non-SAPI environment, or no filename present
                 $this->writeFile($targetPath);
                 break;
@@ -196,7 +196,7 @@ class UploadedFile implements UploadedFileInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @return int|null The file size in bytes or null if unknown.
      */
@@ -206,7 +206,7 @@ class UploadedFile implements UploadedFileInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @see http://php.net/manual/en/features.file-upload.errors.php
      * @return int One of PHP's UPLOAD_ERR_XXX constants.
@@ -217,7 +217,7 @@ class UploadedFile implements UploadedFileInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @return string|null The filename sent by the client or null if none
      *     was provided.
@@ -228,7 +228,7 @@ class UploadedFile implements UploadedFileInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getClientMediaType() : ?string
     {
@@ -236,7 +236,7 @@ class UploadedFile implements UploadedFileInterface
     }
 
     /**
-     * Write internal stream to given path
+     * Write internal stream to given path.
      *
      * @param string $path
      */

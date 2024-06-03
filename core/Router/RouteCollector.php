@@ -25,10 +25,10 @@ class RouteCollector
      */
     public function __construct(RouteParser $routeParser, DataGenerator $dataGenerator)
     {
-        $this->routeParser        = $routeParser;
-        $this->dataGenerator      = $dataGenerator;
+        $this->routeParser = $routeParser;
+        $this->dataGenerator = $dataGenerator;
         $this->currentGroupPrefix = '';
-        $this->middlewares        = [];
+        $this->middlewares = [];
     }
 
     /**
@@ -50,8 +50,8 @@ class RouteCollector
      */
     public function group(string $prefix, callable $callback): void
     {
-        $previousGroupPrefix      = $this->currentGroupPrefix;
-        $this->currentGroupPrefix = $previousGroupPrefix . $prefix;
+        $previousGroupPrefix = $this->currentGroupPrefix;
+        $this->currentGroupPrefix = $previousGroupPrefix.$prefix;
         $callback($this);
         $this->currentGroupPrefix = $previousGroupPrefix;
     }
@@ -130,7 +130,7 @@ class RouteCollector
     private function addRoute(string $httpMethod, string $route, mixed $handler, array $middlewares = []): void
     {
         $route = $this->normalizeRoute(
-            $this->currentGroupPrefix . $route
+            $this->currentGroupPrefix.$route
         );
 
         // Putting route middlewares in a key value array
@@ -155,6 +155,7 @@ class RouteCollector
     private function normalizeRoute(string $route): string
     {
         $route = preg_replace('/\/+/', '/', trim($route, '/'));
+
         return "/{$route}/";
     }
 }

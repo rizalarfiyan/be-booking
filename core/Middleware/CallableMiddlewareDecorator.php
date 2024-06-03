@@ -45,7 +45,7 @@ final class CallableMiddlewareDecorator implements MiddlewareInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      * @throws MissingResponseException if the decorated middleware
      *     fails to produce a response.
      */
@@ -55,6 +55,7 @@ final class CallableMiddlewareDecorator implements MiddlewareInterface
         if (! $response instanceof ResponseInterface) {
             throw MissingResponseException::forCallableMiddleware($this->middleware);
         }
+
         return $response;
     }
 }

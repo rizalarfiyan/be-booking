@@ -63,7 +63,7 @@ final class DoublePassMiddlewareDecorator implements MiddlewareInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      * @throws MissingResponseException if the decorated middleware
      *     fails to produce a response.
      */

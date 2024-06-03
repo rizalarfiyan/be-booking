@@ -76,6 +76,7 @@ trait MessageTrait
         $this->validateProtocolVersion($version);
         $new = clone $this;
         $new->protocol = $version;
+
         return $new;
     }
 
@@ -202,7 +203,7 @@ trait MessageTrait
         $value = $this->filterHeaderValue($value);
 
         $new->headerNames[$normalized] = $header;
-        $new->headers[$header]         = $value;
+        $new->headers[$header] = $value;
 
         return $new;
     }
@@ -237,6 +238,7 @@ trait MessageTrait
         $new = clone $this;
         $value = $this->filterHeaderValue($value);
         $new->headers[$header] = array_merge($this->headers[$header], $value);
+
         return $new;
     }
 
@@ -259,10 +261,11 @@ trait MessageTrait
         }
 
         $normalized = strtolower($header);
-        $original   = $this->headerNames[$normalized];
+        $original = $this->headerNames[$normalized];
 
         $new = clone $this;
         unset($new->headers[$original], $new->headerNames[$normalized]);
+
         return $new;
     }
 
@@ -293,6 +296,7 @@ trait MessageTrait
     {
         $new = clone $this;
         $new->stream = $body;
+
         return $new;
     }
 
@@ -305,8 +309,8 @@ trait MessageTrait
         if (! is_string($stream) && ! is_resource($stream)) {
             throw new InvalidArgumentException(
                 'Stream must be a string stream resource identifier, '
-                . 'an actual stream resource, '
-                . 'or a Psr\Http\Message\StreamInterface implementation'
+                .'an actual stream resource, '
+                .'or a Psr\Http\Message\StreamInterface implementation'
             );
         }
 
@@ -338,7 +342,7 @@ trait MessageTrait
     }
 
     /**
-     * Validate the HTTP protocol version
+     * Validate the HTTP protocol version.
      *
      * @param string $version
      * @throws InvalidArgumentException on invalid HTTP protocol version
@@ -380,7 +384,7 @@ trait MessageTrait
         if ([] === $values) {
             throw new InvalidArgumentException(
                 'Invalid header value: must be a string or array of strings; '
-                . 'cannot be an empty array'
+                .'cannot be an empty array'
             );
         }
 

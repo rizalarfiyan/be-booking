@@ -27,6 +27,7 @@ final class ErrorResponseGenerator
         $body = $response->getBody();
 
         $body->write($response->getReasonPhrase() ?: 'Unknown Error');
+
         return $response;
     }
 }

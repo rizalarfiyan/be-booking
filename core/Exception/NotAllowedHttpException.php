@@ -2,8 +2,8 @@
 
 namespace Booking\Exception;
 
-use Psr\Http\Message\ServerRequestInterface;
 use Exception;
+use Psr\Http\Message\ServerRequestInterface;
 
 class NotAllowedHttpException extends BaseException
 {
@@ -13,8 +13,8 @@ class NotAllowedHttpException extends BaseException
      */
     public function __construct(ServerRequestInterface $request, Exception $previous = null)
     {
-        $method  = $request->getMethod();
-        $path    = $request->getUri()->getPath();
+        $method = $request->getMethod();
+        $path = $request->getUri()->getPath();
         $message = "Method {$method} is not allowed in path {$path}";
 
         parent::__construct($message, 405, $previous);

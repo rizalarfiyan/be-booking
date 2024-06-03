@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace Booking\Trait;
 
-use Psr\Http\Message\ResponseInterface;
 use Booking\Exception\EmitterException;
+use Psr\Http\Message\ResponseInterface;
 
 trait SapiEmitterTrait
 {
@@ -49,13 +49,13 @@ trait SapiEmitterTrait
     private function emitStatusLine(ResponseInterface $response) : void
     {
         $reasonPhrase = $response->getReasonPhrase();
-        $statusCode   = $response->getStatusCode();
+        $statusCode = $response->getStatusCode();
 
         header(sprintf(
             'HTTP/%s %d%s',
             $response->getProtocolVersion(),
             $statusCode,
-            ($reasonPhrase ? ' ' . $reasonPhrase : '')
+            ($reasonPhrase ? ' '.$reasonPhrase : '')
         ), true, $statusCode);
     }
 
@@ -72,8 +72,8 @@ trait SapiEmitterTrait
         $statusCode = $response->getStatusCode();
 
         foreach ($response->getHeaders() as $header => $values) {
-            $name  = $this->filterHeader($header);
-            $first = !($name === 'Set-Cookie');
+            $name = $this->filterHeader($header);
+            $first = ! ($name === 'Set-Cookie');
             foreach ($values as $value) {
                 header(sprintf(
                     '%s: %s',
@@ -86,7 +86,7 @@ trait SapiEmitterTrait
     }
 
     /**
-     * Filter a header name to word case
+     * Filter a header name to word case.
      */
     private function filterHeader(string $header) : string
     {

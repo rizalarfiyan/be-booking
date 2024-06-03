@@ -54,6 +54,7 @@ class ExceptionHandler
                         $messages = explode('- ', $t->getFullMessage());
                         $messages = array_unique(array_filter($messages));
                         $messages = array_values(array_map('trim', $messages));
+
                         return $messages;
                     })($t),
                     'code'      => 422,
@@ -71,7 +72,7 @@ class ExceptionHandler
                 break;
         }
 
-        if (!$isProd && $data['code'] != 422) {
+        if (! $isProd && $data['code'] != 422) {
             $data['trace'] = $t->getTrace();
         }
 
@@ -86,6 +87,7 @@ class ExceptionHandler
     private static function sendResponse(array $data = [], int $code = 500): ResponseInterface
     {
         $headers = config('cors');
+
         return new JsonResponse($data, $code, $headers ?? []);
     }
 }

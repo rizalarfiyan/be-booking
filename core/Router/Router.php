@@ -10,10 +10,10 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class Router
 {
-    /**  @var string */
-    const ROUTES_FILE = __DIR__ . '/../../routes/api.php';
+    /** @var string */
+    public const ROUTES_FILE = __DIR__.'/../../routes/api.php';
 
-    /**  @var ?RouteCollector */
+    /** @var ?RouteCollector */
     private ?RouteCollector $collector = null;
 
     /**
@@ -21,7 +21,7 @@ class Router
      */
     public function __construct(string $routes = null)
     {
-        if (!$routes) {
+        if (! $routes) {
             $routes = self::ROUTES_FILE;
         }
 
@@ -83,7 +83,7 @@ class Router
     }
 
     /**
-     * Get the dispatcher
+     * Get the dispatcher.
      *
      * @return RouteCollector
      */
@@ -108,7 +108,7 @@ class Router
     }
 
     /**
-     * Get the dispatcher
+     * Get the dispatcher.
      *
      * @return Dispatcher
      */

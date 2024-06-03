@@ -1,9 +1,9 @@
 <?php
 
-use Psr\Http\Message\ServerRequestInterface;
-use Booking\Response\Response;
 use Booking\Emitter\SapiEmitter;
 use Booking\Request\ServerRequestFactory;
+use Booking\Response\Response;
+use Psr\Http\Message\ServerRequestInterface;
 
 return [
     'emitter'  => DI\create(SapiEmitter::class),

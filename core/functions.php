@@ -28,7 +28,7 @@ function createUploadedFile(array $spec) : UploadedFile
     ) {
         throw new InvalidArgumentException(sprintf(
             '$spec provided to %s MUST contain each of the keys "tmp_name",'
-            . ' "size", and "error"; one or more were missing',
+            .' "size", and "error"; one or more were missing',
             __FUNCTION__
         ));
     }
@@ -114,7 +114,6 @@ function marshalProtocolVersionFromSapi(array $server) : string
     return $matches['version'];
 }
 
-
 /**
  * Marshal a Uri instance based on the values presnt in the $_SERVER array and headers.
  *
@@ -131,10 +130,11 @@ function marshalUriFromSapi(array $server, array $headers) : Uri
      * @return mixed
      */
     $getHeaderFromArray = function (string $name, array $headers, $default = null) {
-        $header  = strtolower($name);
+        $header = strtolower($name);
         $headers = array_change_key_case($headers, CASE_LOWER);
         if (array_key_exists($header, $headers)) {
             $value = is_array($headers[$header]) ? implode(', ', $headers[$header]) : $headers[$header];
+
             return $value;
         }
 
@@ -148,9 +148,9 @@ function marshalUriFromSapi(array $server, array $headers) : Uri
      */
     $marshalHostAndPort = function (array $headers, array $server) use ($getHeaderFromArray) : array {
         /**
-        * @param string|array $host
-        * @return array Array of two items, host and port, in that order (can be passed to a list() operation).
-        */
+         * @param string|array $host
+         * @return array Array of two items, host and port, in that order (can be passed to a list() operation).
+         */
         $marshalHostAndPortFromHeader = function ($host) {
             if (is_array($host)) {
                 $host = implode(', ', $host);
@@ -168,16 +168,17 @@ function marshalUriFromSapi(array $server, array $headers) : Uri
         };
 
         /**
-        * @return array Array of two items, host and port, in that order (can be passed to a list() operation).
-        */
+         * @return array Array of two items, host and port, in that order (can be passed to a list() operation).
+         */
         $marshalIpv6HostAndPort = function (array $server, ?int $port) : array {
-            $host = '[' . $server['SERVER_ADDR'] . ']';
+            $host = '['.$server['SERVER_ADDR'].']';
             $port = $port ?: 80;
-            if ($port . ']' === substr($host, strrpos($host, ':') + 1)) {
+            if ($port.']' === substr($host, strrpos($host, ':') + 1)) {
                 // The last digit of the IPv6-Address has been taken as port
                 // Unset the port so the default port can be used
                 $port = null;
             }
+
             return [$host, $port];
         };
 
@@ -212,7 +213,7 @@ function marshalUriFromSapi(array $server, array $headers) : Uri
     };
 
     /**
-     * Detect the path for the request
+     * Detect the path for the request.
      *
      * Looks at a variety of criteria in order to attempt to autodetect the base
      * request path, including:
@@ -229,7 +230,7 @@ function marshalUriFromSapi(array $server, array $headers) : Uri
         // IIS7 with URL Rewrite: make sure we get the unencoded url
         // (double slash problem).
         $iisUrlRewritten = $server['IIS_WasUrlRewritten'] ?? null;
-        $unencodedUrl    = $server['UNENCODED_URL'] ?? '';
+        $unencodedUrl = $server['UNENCODED_URL'] ?? '';
         if ('1' === $iisUrlRewritten && ! empty($unencodedUrl)) {
             return $unencodedUrl;
         }
@@ -315,7 +316,7 @@ function marshalUriFromSapi(array $server, array $headers) : Uri
 }
 
 /**
- * Marshal the $_SERVER array
+ * Marshal the $_SERVER array.
  *
  * Pre-processes and returns the $_SERVER superglobal. In particularly, it
  * attempts to detect the Authorization header, which is often not aggregated
@@ -343,11 +344,13 @@ function normalizeServer(array $server, callable $apacheRequestHeaderCallback = 
     $apacheRequestHeaders = $apacheRequestHeaderCallback();
     if (isset($apacheRequestHeaders['Authorization'])) {
         $server['HTTP_AUTHORIZATION'] = $apacheRequestHeaders['Authorization'];
+
         return $server;
     }
 
     if (isset($apacheRequestHeaders['authorization'])) {
         $server['HTTP_AUTHORIZATION'] = $apacheRequestHeaders['authorization'];
+
         return $server;
     }
 
@@ -355,7 +358,7 @@ function normalizeServer(array $server, callable $apacheRequestHeaderCallback = 
 }
 
 /**
- * Normalize uploaded files
+ * Normalize uploaded files.
  *
  * Transforms each value into an UploadedFile instance, and ensures that nested
  * arrays are normalized.
@@ -403,6 +406,7 @@ function normalizeUploadedFiles(array $files) : array
                 'type' => $typeTree[$key] ?? null,
             ]);
         }
+
         return $normalized;
     };
 
@@ -427,8 +431,8 @@ function normalizeUploadedFiles(array $files) : array
         ) {
             throw new InvalidArgumentException(sprintf(
                 '$files provided to %s MUST contain each of the keys "tmp_name",'
-                . ' "size", and "error", with each represented as an array;'
-                . ' one or more were missing or non-array values',
+                .' "size", and "error", with each represented as an array;'
+                .' one or more were missing or non-array values',
                 __FUNCTION__
             ));
         }
@@ -466,9 +470,9 @@ function normalizeUploadedFiles(array $files) : array
 
         throw new InvalidArgumentException('Invalid value in files specification');
     }
+
     return $normalized;
 }
-
 
 /**
  * Parse a cookie header according to RFC 6265.

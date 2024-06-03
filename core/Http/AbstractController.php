@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Booking\Http;
 
-use Psr\Http\Message\ServerRequestInterface;
 use Booking\Response\JsonResponse;
+use Psr\Http\Message\ServerRequestInterface;
 
 abstract class AbstractController implements ControllerInterface
 {
     /**
-     * Parse the data to array
+     * Parse the data to array.
      *
      * @param  ServerRequestInterface $request
      * @return array
@@ -22,7 +22,7 @@ abstract class AbstractController implements ControllerInterface
 
     /**
      * Get the current in query string
-     * or return a default value
+     * or return a default value.
      *
      * @param  ServerRequestInterface $request
      * @return int
@@ -53,7 +53,7 @@ abstract class AbstractController implements ControllerInterface
     }
 
     /**
-     * Send response as json
+     * Send response as json.
      *
      * @param  array        $content
      * @param  int          $code

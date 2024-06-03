@@ -12,7 +12,7 @@ class NotFoundException extends BaseException
      */
     public function __construct(string $message = null, Exception $previous = null)
     {
-        if (!$message) {
+        if (! $message) {
             $message = 'Resource not found';
         }
 

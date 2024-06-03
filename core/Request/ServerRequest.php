@@ -18,7 +18,7 @@ use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriInterface;
 
 /**
- * Server-side HTTP request
+ * Server-side HTTP request.
  *
  * Extends the Request definition to add methods for accessing incoming data,
  * specifically server parameters, cookies, matched path parameters, query
@@ -79,16 +79,16 @@ class ServerRequest implements ServerRequestInterface
      * @throws InvalidArgumentException for any invalid value.
      */
     public function __construct(
-        array                  $serverParams = [],
-        array                  $uploadedFiles = [],
-        UriInterface|string    $uri = null,
-        string                 $method = null,
+        array $serverParams = [],
+        array $uploadedFiles = [],
+        UriInterface|string $uri = null,
+        string $method = null,
         StreamInterface|string $body = 'php://input',
-        array                  $headers = [],
-        array                  $cookies = [],
-        array                  $queryParams = [],
-        object|array           $parsedBody = null,
-        string                 $protocol = '1.1'
+        array $headers = [],
+        array $cookies = [],
+        array $queryParams = [],
+        object|array $parsedBody = null,
+        string $protocol = '1.1'
     ) {
         $this->validateUploadedFiles($uploadedFiles);
 
@@ -97,16 +97,16 @@ class ServerRequest implements ServerRequestInterface
         }
 
         $this->initialize($uri, $method, $body, $headers);
-        $this->serverParams  = $serverParams;
+        $this->serverParams = $serverParams;
         $this->uploadedFiles = $uploadedFiles;
-        $this->cookieParams  = $cookies;
-        $this->queryParams   = $queryParams;
-        $this->parsedBody    = $parsedBody;
-        $this->protocol      = $protocol;
+        $this->cookieParams = $cookies;
+        $this->queryParams = $queryParams;
+        $this->parsedBody = $parsedBody;
+        $this->protocol = $protocol;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getServerParams() : array
     {
@@ -114,7 +114,7 @@ class ServerRequest implements ServerRequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getUploadedFiles() : array
     {
@@ -122,18 +122,19 @@ class ServerRequest implements ServerRequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function withUploadedFiles(array $uploadedFiles) : ServerRequest
+    public function withUploadedFiles(array $uploadedFiles) : self
     {
         $this->validateUploadedFiles($uploadedFiles);
         $new = clone $this;
         $new->uploadedFiles = $uploadedFiles;
+
         return $new;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getCookieParams() : array
     {
@@ -141,17 +142,18 @@ class ServerRequest implements ServerRequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function withCookieParams(array $cookies) : ServerRequest
+    public function withCookieParams(array $cookies) : self
     {
         $new = clone $this;
         $new->cookieParams = $cookies;
+
         return $new;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getQueryParams() : array
     {
@@ -159,17 +161,18 @@ class ServerRequest implements ServerRequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function withQueryParams(array $query) : ServerRequest
+    public function withQueryParams(array $query) : self
     {
         $new = clone $this;
         $new->queryParams = $query;
+
         return $new;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getParsedBody()
     {
@@ -177,9 +180,9 @@ class ServerRequest implements ServerRequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function withParsedBody($data) : ServerRequest
+    public function withParsedBody($data) : self
     {
         if (! is_array($data) && ! is_object($data) && null !== $data) {
             throw new InvalidArgumentException(sprintf(
@@ -191,11 +194,12 @@ class ServerRequest implements ServerRequestInterface
 
         $new = clone $this;
         $new->parsedBody = $data;
+
         return $new;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getAttributes() : array
     {
@@ -203,7 +207,7 @@ class ServerRequest implements ServerRequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getAttribute($attribute, $default = null)
     {
@@ -215,22 +219,24 @@ class ServerRequest implements ServerRequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function withAttribute($attribute, $value) : ServerRequest
+    public function withAttribute($attribute, $value) : self
     {
         $new = clone $this;
         $new->attributes[$attribute] = $value;
+
         return $new;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function withoutAttribute($attribute) : ServerRequest
+    public function withoutAttribute($attribute) : self
     {
         $new = clone $this;
         unset($new->attributes[$attribute]);
+
         return $new;
     }
 

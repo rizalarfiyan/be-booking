@@ -19,7 +19,7 @@ final class PathMiddlewareDecorator implements MiddlewareInterface
     /** @var MiddlewareInterface */
     private MiddlewareInterface $middleware;
 
-    /** @var string Path prefix under which the middleware is segregated.  */
+    /** @var string Path prefix under which the middleware is segregated. */
     private string $prefix;
 
     public function __construct(string $prefix, MiddlewareInterface $middleware)
@@ -70,14 +70,16 @@ final class PathMiddlewareDecorator implements MiddlewareInterface
         }
 
         $length = strlen($this->prefix);
+
         return strlen($path) > $length ? $path[$length] : '';
     }
 
     private function prepareRequestWithTruncatedPrefix(ServerRequestInterface $request) : ServerRequestInterface
     {
-        $uri  = $request->getUri();
+        $uri = $request->getUri();
         $path = $this->getTruncatedPath($this->prefix, $uri->getPath());
-        $new  = $uri->withPath($path);
+        $new = $uri->withPath($path);
+
         return $request->withUri($new);
     }
 
@@ -94,7 +96,7 @@ final class PathMiddlewareDecorator implements MiddlewareInterface
 
     private function prepareHandlerForOriginalRequest(RequestHandlerInterface $handler) : RequestHandlerInterface
     {
-        return new class ($handler, $this->prefix) implements RequestHandlerInterface {
+        return new class($handler, $this->prefix) implements RequestHandlerInterface {
             /** @var RequestHandlerInterface */
             private RequestHandlerInterface $handler;
 
@@ -120,7 +122,8 @@ final class PathMiddlewareDecorator implements MiddlewareInterface
             public function handle(ServerRequestInterface $request) : ResponseInterface
             {
                 $uri = $request->getUri();
-                $uri = $uri->withPath($this->prefix . $uri->getPath());
+                $uri = $uri->withPath($this->prefix.$uri->getPath());
+
                 return $this->handler->handle($request->withUri($uri));
             }
         };
@@ -133,9 +136,10 @@ final class PathMiddlewareDecorator implements MiddlewareInterface
     private function normalizePrefix(string $prefix) : string
     {
         $prefix = strlen($prefix) > 1 ? rtrim($prefix, '/') : $prefix;
-        if (!str_starts_with($prefix, '/')) {
-            $prefix = '/' . $prefix;
+        if (! str_starts_with($prefix, '/')) {
+            $prefix = '/'.$prefix;
         }
+
         return $prefix;
     }
 }

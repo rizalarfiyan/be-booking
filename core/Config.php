@@ -10,7 +10,7 @@ use SplFileInfo;
 class Config
 {
     /** @var string */
-    const PATH = __DIR__ . '/../config';
+    public const PATH = __DIR__.'/../config';
 
     /** @var Config */
     private static Config $instance;
@@ -21,9 +21,9 @@ class Config
     /**
      * @return Config
      */
-    public static function getInstance(): Config
+    public static function getInstance(): self
     {
-        if (!isset(self::$instance)) {
+        if (! isset(self::$instance)) {
             self::$instance = new self();
         }
 
@@ -39,7 +39,7 @@ class Config
      */
     public static function get(string $key, mixed $default = null): mixed
     {
-        if (!self::$data) {
+        if (! self::$data) {
             self::$instance->loadData();
         }
 
@@ -47,7 +47,7 @@ class Config
 
         $pointer = self::$data;
         while ($part = array_shift($parts)) {
-            if (!array_key_exists($part, $pointer)) {
+            if (! array_key_exists($part, $pointer)) {
                 return $default;
             }
 

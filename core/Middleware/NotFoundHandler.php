@@ -46,6 +46,7 @@ final class NotFoundHandler implements MiddlewareInterface
             $request->getMethod(),
             $request->getUri()
         ));
+
         return $response;
     }
 }
