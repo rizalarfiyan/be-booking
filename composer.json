@@ -35,6 +35,7 @@
     "respect/validation": "^2.3",
     "sergeytsalkov/meekrodb": "^2.5",
     "symfony/dotenv": "^7.1",
+    "illuminate/collections": "^11.9",
     "nesbot/carbon": "^3.4"
   }
 }

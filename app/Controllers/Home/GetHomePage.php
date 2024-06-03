@@ -25,7 +25,9 @@ class GetHomePage extends Controller
             'data' => [
                 'page' => $this->getCurrentPage($req),
                 'size' => $this->getPageSize($req),
-                'users' => $userRepository->getAll(),
+                'users' => collect($userRepository->getAll())->map(function ($user) {
+                    return collect($user)->only(['id', 'name', 'email', 'created_at', 'updated_at']);
+                })
             ]
         ];
 
