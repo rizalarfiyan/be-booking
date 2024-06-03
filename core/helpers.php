@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 use JetBrains\PhpStorm\NoReturn;
 use Booking\Config;
+use Cake\Chronos\Chronos;
+use Cake\Chronos\ChronosDate;
+use Cake\Chronos\ChronosTime;
 
 if (!function_exists('config')) {
     /**
@@ -19,6 +22,21 @@ if (!function_exists('config')) {
     }
 }
 
+if (!function_exists('datetime')) {
+    /**
+     * Get the time with chronos library using paramter.
+     *
+     * @param ChronosDate|ChronosTime|DateTimeInterface|string|int|null $time
+     * @param DateTimeZone|string|null $timezone
+     * @return Chronos
+     */
+    function datetime(ChronosDate|ChronosTime|DateTimeInterface|string|int|null $time = 'now',
+                     DateTimeZone|string|null                                  $timezone = null): Chronos
+    {
+        return new Chronos($time, $timezone);
+    }
+}
+
 if (!function_exists('is_production')) {
     /**
      * Get the config value based on name.
@@ -27,7 +45,7 @@ if (!function_exists('is_production')) {
      */
     function is_production(): bool
     {
-        return (bool) config('app.env') == 'production';
+        return (bool)config('app.env') == 'production';
     }
 }
 
