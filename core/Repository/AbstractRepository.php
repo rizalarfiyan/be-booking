@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Booking\Repository;
 
-use Booking\Config;
 use MeekroDB;
 
 abstract class AbstractRepository implements RepositoryInterface
@@ -21,7 +20,7 @@ abstract class AbstractRepository implements RepositoryInterface
 
     public function init(): void
     {
-        $conf = Config::get('db');
+        $conf = config('db');
         $this->db = new MeekroDB($conf['host'], $conf['user'], $conf['password'], $conf['name'], $conf['port']);
     }
 }

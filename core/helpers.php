@@ -15,7 +15,7 @@ if (!function_exists('config')) {
      */
     function config(string $name, $default = null): mixed
     {
-        return Config::get($name, $default);
+        return Config::getInstance()->get($name, $default);
     }
 }
 

@@ -2,7 +2,6 @@
 
 namespace Booking\Exception;
 
-use Booking\Config;
 use Booking\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -86,8 +85,7 @@ class ExceptionHandler
      */
     private static function sendResponse(array $data = [], int $code = 500): ResponseInterface
     {
-        $headers = (Config::getInstance())->get('cors');
-
+        $headers = config('cors');
         return new JsonResponse($data, $code, $headers ?? []);
     }
 }

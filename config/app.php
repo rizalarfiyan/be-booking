@@ -8,4 +8,6 @@ return [
     'name'     => getenv('APP_NAME') ?: 'Booking',
     'cache_dir' => getenv('APP_CACHE_DIR') ?: __DIR__ . '/../tmp',
     'page_size' => 15,
+    'timezone' => 'Asia/Jakarta',
+    'locale' => 'id',
 ];

@@ -13,7 +13,6 @@ use Exception;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Symfony\Component\Dotenv\Dotenv;
 use Throwable;
 
 
@@ -35,22 +34,9 @@ class Application
      */
     public function __construct(string $routes = null)
     {
-        $this->loadEnv();
         $this->config = Config::getInstance();
         $this->container = $this->makeContainer();
         $this->router = new Router($routes);
-    }
-
-    /**
-     * Load the environment variables
-     *
-     * @return void
-     */
-    private function loadEnv(): void
-    {
-        $dotenv = new Dotenv();
-        $dotenv->usePutenv();
-        $dotenv->bootEnv(__DIR__ . '/../.env');
     }
 
     /**
