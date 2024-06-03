@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use JetBrains\PhpStorm\NoReturn;
+use Booking\Config;
 
 if (!function_exists('config')) {
     /**
@@ -14,7 +15,7 @@ if (!function_exists('config')) {
      */
     function config(string $name, $default = null): mixed
     {
-        return Booking\Config::getInstance()->get($name, $default);
+        return Config::get($name, $default);
     }
 }
 

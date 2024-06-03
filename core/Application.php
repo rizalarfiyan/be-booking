@@ -9,10 +9,13 @@ use Booking\Middleware\MiddlewarePipe;
 use Booking\Middleware\RouteProcessor;
 use Booking\Router\Router;
 use DI\ContainerBuilder;
+use Exception;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Exception;
+use Symfony\Component\Dotenv\Dotenv;
+use Throwable;
+
 
 class Application
 {
@@ -32,9 +35,22 @@ class Application
      */
     public function __construct(string $routes = null)
     {
+        $this->loadEnv();
         $this->config = Config::getInstance();
         $this->container = $this->makeContainer();
         $this->router = new Router($routes);
+    }
+
+    /**
+     * Load the environment variables
+     *
+     * @return void
+     */
+    private function loadEnv(): void
+    {
+        $dotenv = new Dotenv();
+        $dotenv->usePutenv();
+        $dotenv->bootEnv(__DIR__ . '/../.env');
     }
 
     /**
@@ -44,7 +60,7 @@ class Application
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function run()
+    public function run(): void
     {
         try {
             $pipeline = new MiddlewarePipe();
@@ -69,11 +85,10 @@ class Application
             $pipeline->pipe(new RouteProcessor($this->container, $routes));
 
             $response = $pipeline->handle($request);
-        } catch (\Throwable $t) {
-//            $logger = $this->container->get('logger');
+        } catch (Throwable $t) {
+            errorLog($t);
             $request = $this->container->get('request');
             $response = ExceptionHandler::handle($t, $request, is_production());
-//            ExceptionLogger::handle($t, $logger, $request);
         }
 
         $this->container->get('emitter')->emit($response);

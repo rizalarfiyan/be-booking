@@ -25,13 +25,15 @@
   },
   "require": {
     "ext-json": "*",
+    "ext-http": "*",
+    "ext-mysqli": "*",
     "php-di/php-di": "^7.0",
     "psr/container": "^2.0",
-    "nikic/fast-route": "^1.3",
     "psr/http-message": "^2.0",
     "psr/http-server-middleware": "^1.0",
-    "fig/http-message-util": "*",
+    "nikic/fast-route": "^1.3",
     "respect/validation": "^2.3",
-    "ext-http": "*"
+    "sergeytsalkov/meekrodb": "^2.5",
+    "symfony/dotenv": "^7.1"
   }
 }
