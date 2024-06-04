@@ -23,7 +23,7 @@
   "require-dev": {
     "symfony/var-dumper": "^7.1",
     "friendsofphp/php-cs-fixer": "^3.58",
-    "squizlabs/php_codesniffer": "^3.10"
+    "byjg/migration": "^4.9"
   },
   "require": {
     "ext-json": "*",
@@ -37,12 +37,19 @@
     "respect/validation": "^2.3",
     "sergeytsalkov/meekrodb": "^2.5",
     "symfony/dotenv": "^7.1",
-    "illuminate/collections": "^11.9",
-    "cakephp/chronos": "^3.0"
+    "cakephp/chronos": "^3.0",
+    "illuminate/collections": "^11.9"
   },
   "scripts": {
     "cs-check": "phpcs",
     "check-style": "./vendor/bin/php-cs-fixer fix --dry-run --diff",
-    "fix-style": "./vendor/bin/php-cs-fixer fix --verbose --show-progress=dots"
+    "fix-style": "./vendor/bin/php-cs-fixer fix --verbose --show-progress=dots",
+    "migration:install": "php ./core/command.php migration:install",
+    "migration:reset": "php ./core/command.php migration:reset",
+    "migration:create": "php ./core/command.php migration:create",
+    "migration:up": "php ./core/command.php migration:up",
+    "migration:down": "php ./core/command.php migration:down",
+    "migration:update": "php ./core/command.php migration:update",
+    "migration:version": "php ./core/command.php migration:version"
   }
 }
