@@ -1,16 +1,16 @@
 -- Migrate to Version 0
 CREATE TABLE users
 (
-    user_id    INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    first_name VARCHAR(50)     NOT NULL,
-    last_name  VARCHAR(50),
+    user_id    INT PRIMARY KEY         NOT NULL AUTO_INCREMENT,
+    first_name VARCHAR(50)             NOT NULL,
+    last_name  VARCHAR(50)             NOT NULL DEFAULT '',
     email      VARCHAR(100) UNIQUE,
-    password   VARCHAR(100),
-    role       ENUM ('admin', 'guest'),
-    points     INT,
-    book_count INT,
-    created_at DATETIME,
-    updated_at DATETIME
+    password   VARCHAR(100)            NOT NULL,
+    role       ENUM ('admin', 'guest') NOT NULL DEFAULT 'guest',
+    points     INT                     NOT NULL DEFAULT 0,
+    book_count INT                     NOT NULL DEFAULT 0,
+    created_at DATETIME                NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE verifications
@@ -19,7 +19,7 @@ CREATE TABLE verifications
     user_id         INT                                    NOT NULL,
     code            VARCHAR(50) UNIQUE                     NOT NULL,
     type            ENUM ('activation', 'forgot_password') NOT NULL,
-    created_at      DATETIME,
+    created_at      DATETIME                               NOT NULL DEFAULT CURRENT_TIMESTAMP,
     activation_at   DATETIME,
     FOREIGN KEY (user_id) REFERENCES users (user_id)
 );

@@ -2,6 +2,7 @@
 
 namespace Booking\Exception;
 
+use Booking\Constants;
 use Booking\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -50,14 +51,11 @@ class ExceptionHandler
             case $t instanceof ValidationException:
                 $data = [
                     'type'      => get_class($t),
-                    'message'   => (function ($t) {
-                        $messages = explode('- ', $t->getFullMessage());
-                        $messages = array_unique(array_filter($messages));
-                        $messages = array_values(array_map('trim', $messages));
-
-                        return $messages;
-                    })($t),
+                    'message'   => Constants::VALIDATION_MESSAGE,
                     'code'      => 422,
+                    'data' => (function ($t) {
+                        return $t->getMessages();
+                    })($t),
                 ];
 
                 break;

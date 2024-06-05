@@ -12,4 +12,14 @@ class UserRepository extends AbstractRepository
     {
         return $this->db->query('SELECT * FROM users');
     }
+
+    public function insert($payload)
+    {
+        return $this->db->insert('users', [
+            'email' => $payload['email'],
+            'first_name' => $payload['first_name'],
+            'last_name' => $payload['last_name'],
+            'password' => $payload['password'],
+        ]);
+    }
 }
