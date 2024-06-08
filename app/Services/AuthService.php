@@ -6,11 +6,13 @@ namespace App\Services;
 
 use App\Constants;
 use App\Repository\UserRepository;
+use App\Repository\VerificationRepository;
 use Booking\Constants as CoreConstants;
 use Booking\Exception\BadRequestException;
 use Booking\Exception\UnauthorizedException;
 use Booking\Exception\UnprocessableEntitiesException;
 use Booking\Mailer;
+use Booking\Repository\BaseRepository;
 use Lcobucci\JWT\Encoding\ChainedFormatter;
 use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
@@ -25,18 +27,28 @@ use Lcobucci\JWT\Validation\Validator;
 use PHPMailer\PHPMailer\Exception;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
+use MeekroDB;
+use MeekroDBException;
 
 class AuthService
 {
+    /** @var MeekroDB */
+    protected MeekroDB $repo;
+
     /** @var UserRepository */
     protected UserRepository $user;
 
+    /** @var VerificationRepository */
+    protected VerificationRepository $verification;
+
     /**
-     * @param UserRepository $user
+     * @param UserRepository $repo
      */
-    public function __construct(UserRepository $user)
+    public function __construct(BaseRepository $repo)
     {
-        $this->user = $user;
+        $this->repo = $repo->db();
+        $this->user = new UserRepository($this->repo);
+        $this->verification = new VerificationRepository($this->repo);
     }
 
     /**
@@ -102,7 +114,7 @@ class AuthService
     public static function getAuthToken(ServerRequestInterface $request): Token
     {
         $authorization = $request->getHeaderLine('Authorization');
-        if (! $authorization) {
+        if (!$authorization) {
             throw new UnauthorizedException('Token not present');
         }
 
@@ -159,7 +171,7 @@ class AuthService
             throw new UnauthorizedException('Invalid token');
         }
 
-        if (! $token->isIdentifiedBy($conf['jti']) || ! $token->hasBeenIssuedBy($issuedBy)) {
+        if (!$token->isIdentifiedBy($conf['jti']) || !$token->hasBeenIssuedBy($issuedBy)) {
             throw new UnauthorizedException('Token not mismatched');
         }
 
@@ -175,13 +187,13 @@ class AuthService
     public static function userResponse($user): array
     {
         return [
-            'user_id' => (int) $user['user_id'],
+            'user_id' => (int)$user['user_id'],
             'first_name' => $user['first_name'],
             'last_name' => $user['last_name'],
             'email' => $user['email'],
             'role' => $user['role'],
-            'points' => (int) $user['points'],
-            'book_count' => (int) $user['book_count'],
+            'points' => (int)$user['points'],
+            'book_count' => (int)$user['book_count'],
         ];
     }
 
@@ -197,18 +209,18 @@ class AuthService
 
         try {
             $code = randomStr();
-            $this->user->db()->startTransaction();
+            $this->repo->startTransaction();
             $userId = $this->user->insert($data);
-
             $verification = [
                 'user_id' => $userId,
                 'type' => Constants::TYPE_VERIFICATION_ACTIVATION,
                 'code' => $code,
+                'expired_at' => datetime()->addHours(1)->format('Y-m-d H:i:s'),
             ];
-            $this->user->insertVerifications($verification);
-            $this->user->db()->commit();
+            $this->verification->insertVerifications($verification);
+            $this->repo->commit();
         } catch (Throwable $e) {
-            $this->user->db()->rollback();
+            $this->repo->rollback();
             errorLog($e);
 
             if ($e->getCode() === 1062) {
@@ -222,8 +234,7 @@ class AuthService
 
         try {
             $fullName = fullName($data['first_name'], $data['last_name']);
-            // TODO: update the url later!
-            $url = 'http://localhost:8000/verify-email?email='.$code;
+            $url = config('url.activation') . '?code=' . $code;
 
             $mailer = new Mailer();
             $mail = $mailer->getMail();
@@ -251,7 +262,7 @@ class AuthService
     {
         $user = $this->user->getByEmail($data['email']);
 
-        if (! $user || ! self::checkPassword($data['password'], $user['password'])) {
+        if (!$user || !self::checkPassword($data['password'], $user['password'])) {
             throw new BadRequestException(CoreConstants::VALIDATION_MESSAGE, [
                 'email' => 'Email or password is incorrect.',
             ]);
@@ -263,7 +274,7 @@ class AuthService
             ]);
         }
 
-        $token = self::generateToken((int) $user['user_id'], $user['role']);
+        $token = self::generateToken((int)$user['user_id'], $user['role']);
 
         return [
             'token' => $token,
@@ -280,5 +291,43 @@ class AuthService
         $user = $this->user->getById($id);
 
         return self::userResponse($user);
+    }
+
+    /**
+     * check if verification is not valid.
+     *
+     * @param $data
+     * @param string $type
+     * @return bool
+     */
+    protected function isNotValidVerification($data, string $type): bool
+    {
+        return !$data || $data['type'] !== $type || datetime($data['expired_at'])->isPast();
+    }
+
+    /**
+     * @param string $code
+     * @return void
+     * @throws BadRequestException
+     * @throws UnprocessableEntitiesException
+     */
+    public function activation(string $code): void
+    {
+        $data = $this->verification->getByCode($code);
+        if ($this->isNotValidVerification($data, Constants::TYPE_VERIFICATION_ACTIVATION)) {
+            throw new BadRequestException('Invalid activation code.');
+        }
+
+        try {
+            $userId = (int)$data['user_id'];
+            $this->repo->startTransaction();
+            $this->user->updateStatus(Constants::TYPE_USER_ACTIVE, $userId);
+            $this->verification->deleteByTypeAndUser(Constants::TYPE_VERIFICATION_ACTIVATION, $userId);
+            $this->repo->commit();
+        } catch (Throwable $e) {
+            $this->repo->rollback();
+            errorLog($e);
+            throw new UnprocessableEntitiesException('User could not be activated, please contact administrator.');
+        }
     }
 }

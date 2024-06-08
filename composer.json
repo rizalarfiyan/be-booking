@@ -52,6 +52,8 @@
     "migration:up": "php ./core/command.php migration:up",
     "migration:down": "php ./core/command.php migration:down",
     "migration:update": "php ./core/command.php migration:update",
-    "migration:version": "php ./core/command.php migration:version"
+    "migration:version": "php ./core/command.php migration:version",
+    "dev": "php -S localhost:8081 -t ./public",
+    "log": "tail -f ./log/db.log ./log/errors.log ./log/info.log"
   }
 }

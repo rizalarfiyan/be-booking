@@ -47,7 +47,7 @@ if (! function_exists('is_production')) {
      */
     function is_production(): bool
     {
-        return (bool) config('app.env') == 'production';
+        return Config::getInstance()->get('app.env') == 'production';
     }
 }
 

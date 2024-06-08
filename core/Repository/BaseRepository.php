@@ -6,27 +6,25 @@ namespace Booking\Repository;
 
 use MeekroDB;
 
-abstract class AbstractRepository
+class BaseRepository
 {
     /**
      * @var MeekroDB
      */
     public MeekroDB $db;
 
-    public function __construct()
+    public function __construct(Meekrodb $db = null)
     {
-        $this->init();
-    }
+        if ($db) {
+            $this->db = $db;
+            return;
+        }
 
-    /**
-     * Initialize the database connection.
-     *
-     * @return void
-     */
-    protected function init(): void
-    {
         $conf = config('db');
         $this->db = new MeekroDB($conf['host'], $conf['user'], $conf['password'], $conf['name'], $conf['port']);
+        if (!is_production()) {
+            $this->db->logfile = __DIR__ . '/../../log/db.log';
+        }
     }
 
     /**

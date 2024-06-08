@@ -11,6 +11,7 @@ $router->group('/api/v1/', function ($router) {
         $auth = App\Middlewares\Jwt::class;
         $router->post('/register', App\Controllers\Auth\PostRegister::class);
         $router->post('/login', App\Controllers\Auth\PostLogin::class);
+        $router->post('/activation', App\Controllers\Auth\PostActivation::class);
         $router->get('/me', App\Controllers\Auth\GetMe::class, [$auth]);
     });
 });
