@@ -3,6 +3,7 @@
 namespace Booking\Exception;
 
 use Exception;
+use Booking\Message\StatusCodeInterface as StatusCode;
 
 class NotFoundException extends BaseApiException
 {
@@ -16,6 +17,6 @@ class NotFoundException extends BaseApiException
             $message = 'Resource not found';
         }
 
-        parent::__construct($message, 404, $previous);
+        parent::__construct($message, StatusCode::STATUS_NOT_FOUND, $previous);
     }
 }

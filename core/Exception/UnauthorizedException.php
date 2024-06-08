@@ -3,6 +3,7 @@
 namespace Booking\Exception;
 
 use Exception;
+use Booking\Message\StatusCodeInterface as StatusCode;
 
 class UnauthorizedException extends BaseApiException
 {
@@ -16,6 +17,6 @@ class UnauthorizedException extends BaseApiException
             $message = 'Unauthorized';
         }
 
-        parent::__construct($message, 401, $previous);
+        parent::__construct($message, StatusCode::STATUS_UNAUTHORIZED, $previous);
     }
 }

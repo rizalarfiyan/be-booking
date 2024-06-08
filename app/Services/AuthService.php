@@ -82,4 +82,28 @@ class AuthService
             throw new UnprocessableEntitiesException('Message could not be sent, please contact administrator.');
         }
     }
+
+    /**
+     * @param $data
+     * @return void
+     * @throws UnprocessableEntitiesException
+     */
+    public function login($data): void
+    {
+        $user = $this->user->getByEmail($data['email']);
+
+        if (!$user || !password_verify($data['password'], $user['password'])) {
+            throw new UnprocessableEntitiesException(CoreConstants::VALIDATION_MESSAGE, [
+                'email' => 'Email or password is incorrect.',
+            ]);
+        }
+
+        if ($user['status'] === Constants::TYPE_USER_INACTIVE) {
+            throw new UnprocessableEntitiesException(CoreConstants::VALIDATION_MESSAGE, [
+                'email' => 'Email is not verified.',
+            ]);
+        }
+
+        // sukses
+    }
 }

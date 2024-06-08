@@ -4,6 +4,7 @@ namespace Booking\Exception;
 
 use Exception;
 use Psr\Http\Message\ServerRequestInterface;
+use Booking\Message\StatusCodeInterface as StatusCode;
 
 class NotAllowedHttpException extends BaseApiException
 {
@@ -17,6 +18,6 @@ class NotAllowedHttpException extends BaseApiException
         $path = $request->getUri()->getPath();
         $message = "Method {$method} is not allowed in path {$path}";
 
-        parent::__construct($message, 405, $previous);
+        parent::__construct($message, StatusCode::STATUS_METHOD_NOT_ALLOWED, $previous);
     }
 }

@@ -19,6 +19,17 @@ class UserRepository extends AbstractRepository
     }
 
     /**
+     * Get user by email
+     *
+     * @param string $email
+     * @return mixed
+     */
+    public function getByEmail(string $email): mixed
+    {
+        return $this->db->queryFirstRow('SELECT * FROM users where email = %s', $email);
+    }
+
+    /**
      * Insert user
      *
      * @param $payload
