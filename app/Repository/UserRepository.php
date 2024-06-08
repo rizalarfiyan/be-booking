@@ -9,7 +9,7 @@ use Booking\Repository\AbstractRepository;
 class UserRepository extends AbstractRepository
 {
     /**
-     * Get all users
+     * Get all users.
      *
      * @return mixed
      */
@@ -19,7 +19,7 @@ class UserRepository extends AbstractRepository
     }
 
     /**
-     * Get user by email
+     * Get user by email.
      *
      * @param string $email
      * @return mixed
@@ -30,7 +30,7 @@ class UserRepository extends AbstractRepository
     }
 
     /**
-     * Insert user
+     * Insert user.
      *
      * @param $payload
      * @return int return the id of the inserted user
@@ -43,11 +43,12 @@ class UserRepository extends AbstractRepository
             'last_name' => $payload['last_name'],
             'password' => $payload['password'],
         ]);
+
         return $this->db->insertId();
     }
 
     /**
-     * Insert user verifications
+     * Insert user verifications.
      *
      * @param $payload
      * @return int return the id of the inserted verification
@@ -59,6 +60,7 @@ class UserRepository extends AbstractRepository
             'code' => $payload['code'],
             'type' => $payload['type'],
         ]);
+
         return $this->db->insertId();
     }
 }

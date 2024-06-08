@@ -2,9 +2,9 @@
 
 namespace Booking\Exception;
 
+use Booking\Message\StatusCodeInterface as StatusCode;
 use Exception;
 use Psr\Http\Message\ServerRequestInterface;
-use Booking\Message\StatusCodeInterface as StatusCode;
 
 class NotAllowedHttpException extends BaseApiException
 {

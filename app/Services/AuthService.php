@@ -5,10 +5,15 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Constants;
-use Booking\Constants as CoreConstants;
 use App\Repository\UserRepository;
+use Booking\Constants as CoreConstants;
 use Booking\Exception\UnprocessableEntitiesException;
 use Booking\Mailer;
+use Lcobucci\JWT\Encoding\ChainedFormatter;
+use Lcobucci\JWT\Encoding\JoseEncoder;
+use Lcobucci\JWT\Signer\Hmac\Sha256;
+use Lcobucci\JWT\Signer\Key\InMemory;
+use Lcobucci\JWT\Token\Builder;
 use PHPMailer\PHPMailer\Exception;
 use Throwable;
 
@@ -26,15 +31,66 @@ class AuthService
     }
 
     /**
+     * Has password with bcrypt.
+     *
+     * @param string $password
+     * @return string
+     */
+    public static function hashPassword(string $password): string
+    {
+        return password_hash($password, PASSWORD_BCRYPT, [
+            'cost' => 12,
+        ]);
+    }
+
+    /**
+     * Check.
+     *
+     * @param string $password
+     * @param string $hash
+     * @return bool
+     */
+    public static function checkPassword(string $password, string $hash): bool
+    {
+        return password_verify($password, $hash);
+    }
+
+    /**
+     * Generate JWT Token.
+     *
+     * @param int $id
+     * @param string $role
+     * @return string
+     */
+    public static function generateToken(int $id, string $role): string
+    {
+        $conf = config('jwt');
+        $issuedBy = config('app.url');
+
+        $tokenBuilder = (new Builder(new JoseEncoder(), ChainedFormatter::default()));
+        $algorithm = new Sha256();
+        $signingKey = InMemory::plainText($conf['secret']);
+
+        $token = $tokenBuilder
+            ->issuedBy($issuedBy)
+            ->identifiedBy($conf['jti'])
+            ->withClaim('id', $id)
+            ->withClaim('role', $role)
+            ->issuedAt(datetime()->toNative())
+            ->expiresAt(datetime()->addSeconds($conf['ttl'])->toNative())
+            ->getToken($algorithm, $signingKey);
+
+        return $token->toString();
+    }
+
+    /**
      * @param $data
      * @return void
      * @throws UnprocessableEntitiesException
      */
     public function register($data): void
     {
-        $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT, [
-            'cost' => 12,
-        ]);
+        $data['password'] = self::hashPassword($data['password']);
 
         try {
             $code = randomStr();
@@ -64,7 +120,7 @@ class AuthService
         try {
             $fullName = fullName($data['first_name'], $data['last_name']);
             // TODO: update the url later!
-            $url = 'http://localhost:8000/verify-email?email=' . $code;
+            $url = 'http://localhost:8000/verify-email?email='.$code;
 
             $mailer = new Mailer();
             $mail = $mailer->getMail();
@@ -85,14 +141,14 @@ class AuthService
 
     /**
      * @param $data
-     * @return void
+     * @return array
      * @throws UnprocessableEntitiesException
      */
-    public function login($data): void
+    public function login($data): array
     {
         $user = $this->user->getByEmail($data['email']);
 
-        if (!$user || !password_verify($data['password'], $user['password'])) {
+        if (! $user || ! self::checkPassword($data['password'], $user['password'])) {
             throw new UnprocessableEntitiesException(CoreConstants::VALIDATION_MESSAGE, [
                 'email' => 'Email or password is incorrect.',
             ]);
@@ -104,6 +160,19 @@ class AuthService
             ]);
         }
 
-        // sukses
+        $token = self::generateToken((int) $user['user_id'], $user['role']);
+
+        return [
+            'token' => $token,
+            'user' => [
+                'user_id' => (int) $user['user_id'],
+                'first_name' => $user['first_name'],
+                'last_name' => $user['last_name'],
+                'email' => $user['email'],
+                'role' => $user['role'],
+                'points' => (int) $user['points'],
+                'book_count' => (int) $user['book_count'],
+            ],
+        ];
     }
 }

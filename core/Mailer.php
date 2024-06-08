@@ -54,7 +54,7 @@ class Mailer
     }
 
     /**
-     * Get template based on file template name and parameter data
+     * Get template based on file template name and parameter data.
      *
      * @param string $templateName
      * @param array $data

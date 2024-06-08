@@ -8,7 +8,7 @@ use Cake\Chronos\ChronosDate;
 use Cake\Chronos\ChronosTime;
 use JetBrains\PhpStorm\NoReturn;
 
-if (!function_exists('config')) {
+if (! function_exists('config')) {
     /**
      * Get the config value based on name.
      *
@@ -22,7 +22,7 @@ if (!function_exists('config')) {
     }
 }
 
-if (!function_exists('datetime')) {
+if (! function_exists('datetime')) {
     /**
      * Get the time with chronos library using paramter.
      *
@@ -39,7 +39,7 @@ if (!function_exists('datetime')) {
     }
 }
 
-if (!function_exists('is_production')) {
+if (! function_exists('is_production')) {
     /**
      * Get the config value based on name.
      *
@@ -47,11 +47,11 @@ if (!function_exists('is_production')) {
      */
     function is_production(): bool
     {
-        return (bool)config('app.env') == 'production';
+        return (bool) config('app.env') == 'production';
     }
 }
 
-if (!function_exists('dd')) {
+if (! function_exists('dd')) {
     /**
      * Dump the passed variables and end the script.
      *
@@ -70,7 +70,7 @@ if (!function_exists('dd')) {
     }
 }
 
-if (!function_exists('bootstrapError')) {
+if (! function_exists('bootstrapError')) {
     /**
      * Returns a json in case bootstrap error.
      *
@@ -92,7 +92,7 @@ if (!function_exists('bootstrapError')) {
     }
 }
 
-if (!function_exists('errorLog')) {
+if (! function_exists('errorLog')) {
     /**
      * A simple logger to use in application bootstrap.
      *
@@ -108,12 +108,12 @@ if (!function_exists('errorLog')) {
             $t->getTraceAsString()
         );
 
-        $file = __DIR__ . '/../log/errors.log';
-        file_put_contents($file, $message . PHP_EOL, FILE_APPEND | LOCK_EX);
+        $file = __DIR__.'/../log/errors.log';
+        file_put_contents($file, $message.PHP_EOL, FILE_APPEND | LOCK_EX);
     }
 }
 
-if (!function_exists('infoLog')) {
+if (! function_exists('infoLog')) {
     /**
      * A simple logger to use in application bootstrap.
      *
@@ -128,12 +128,12 @@ if (!function_exists('infoLog')) {
             $message
         );
 
-        $file = __DIR__ . '/../log/info.log';
-        file_put_contents($file, $message . PHP_EOL, FILE_APPEND | LOCK_EX);
+        $file = __DIR__.'/../log/info.log';
+        file_put_contents($file, $message.PHP_EOL, FILE_APPEND | LOCK_EX);
     }
 }
 
-if (!function_exists('fullName')) {
+if (! function_exists('fullName')) {
     /**
      * Get full name based on first name and last name.
      *
@@ -143,16 +143,16 @@ if (!function_exists('fullName')) {
      */
     function fullName(string $firstName, string $lastName = null): string
     {
-        if (!$lastName) return $firstName;
+        if (! $lastName) return $firstName;
 
         return "$firstName $lastName";
     }
 }
 
 
-if (!function_exists('randomStr')) {
+if (! function_exists('randomStr')) {
     /**
-     * Generate random string with length
+     * Generate random string with length.
      *
      * @param int $length
      * @return string
@@ -164,6 +164,7 @@ if (!function_exists('randomStr')) {
             if (strlen($random) > $length) {
                 return substr($random, 0, $length);
             }
+
             return $random;
         } catch (Exception) {
             return md5(uniqid(rand().microtime(), true));

@@ -2,8 +2,8 @@
 
 namespace Booking\Exception;
 
-use Exception;
 use Booking\Message\StatusCodeInterface as StatusCode;
+use Exception;
 
 class UnprocessableEntitiesException extends BaseApiException
 {

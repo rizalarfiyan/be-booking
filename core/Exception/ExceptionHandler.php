@@ -79,7 +79,7 @@ class ExceptionHandler
                 break;
         }
 
-        if (!$isProd && $data['code'] != 422) {
+        if (! $isProd && $data['code'] != 422) {
             $data['trace'] = $t->getTrace();
         }
 

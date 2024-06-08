@@ -27,8 +27,8 @@ class PostLogin extends BaseAuthController
             ->key('password', v::stringType());
 
         $validation->assert($data);
-        $this->auth->login($data);
+        $data = $this->auth->login($data);
 
-        return $this->sendJson(null, StatusCode::STATUS_OK, 'User login successfully.');
+        return $this->sendJson($data, StatusCode::STATUS_OK, 'User login successfully.');
     }
 }

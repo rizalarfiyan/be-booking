@@ -6,6 +6,7 @@ namespace App\Controllers\Home;
 
 use App\Controllers\Controller;
 use App\Repository\UserRepository;
+use App\Services\AuthService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 

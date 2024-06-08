@@ -39,7 +39,8 @@
     "symfony/dotenv": "^7.1",
     "cakephp/chronos": "^3.0",
     "illuminate/collections": "^11.9",
-    "phpmailer/phpmailer": "^6.9"
+    "phpmailer/phpmailer": "^6.9",
+    "lcobucci/jwt": "^5.3"
   },
   "scripts": {
     "cs-check": "phpcs",
