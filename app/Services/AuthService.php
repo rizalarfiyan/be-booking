@@ -7,14 +7,23 @@ namespace App\Services;
 use App\Constants;
 use App\Repository\UserRepository;
 use Booking\Constants as CoreConstants;
+use Booking\Exception\BadRequestException;
+use Booking\Exception\UnauthorizedException;
 use Booking\Exception\UnprocessableEntitiesException;
 use Booking\Mailer;
 use Lcobucci\JWT\Encoding\ChainedFormatter;
 use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key\InMemory;
+use Lcobucci\JWT\Token;
 use Lcobucci\JWT\Token\Builder;
+use Lcobucci\JWT\Token\Parser;
+use Lcobucci\JWT\Validation\Constraint\HasClaim;
+use Lcobucci\JWT\Validation\Constraint\IdentifiedBy;
+use Lcobucci\JWT\Validation\Constraint\SignedWith;
+use Lcobucci\JWT\Validation\Validator;
 use PHPMailer\PHPMailer\Exception;
+use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 
 class AuthService
@@ -84,9 +93,103 @@ class AuthService
     }
 
     /**
+     * Get Auth JWT Token.
+     *
+     * @param ServerRequestInterface $request
+     * @return Token
+     * @throws UnauthorizedException
+     */
+    public static function getAuthToken(ServerRequestInterface $request): Token
+    {
+        $authorization = $request->getHeaderLine('Authorization');
+        if (! $authorization) {
+            throw new UnauthorizedException('Token not present');
+        }
+
+        $authorizationToken = explode(' ', $authorization);
+        if (count($authorizationToken) !== 2 || $authorizationToken[0] !== 'Bearer') {
+            throw new UnauthorizedException('Invalid token');
+        }
+
+        try {
+            $token = (new Parser(new JoseEncoder()))->parse($authorizationToken[1]);
+        } catch (Throwable) {
+            throw new UnauthorizedException('Invalid token');
+        }
+
+        return $token;
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @return int
+     * @throws UnauthorizedException
+     */
+    public static function getUserIdFromToken(ServerRequestInterface $request): int
+    {
+        $token = self::getAuthToken($request);
+
+        return $token->claims()->get('id');
+    }
+
+    /**
+     * Validate JWT Token.
+     *
+     * @param Token $token
+     * @return void
+     * @throws UnauthorizedException
+     */
+    public static function validateToken(Token $token): void
+    {
+        $conf = config('jwt');
+        $issuedBy = config('app.url');
+
+        $constraints = [
+            new SignedWith(new Sha256(), InMemory::plainText($conf['secret'])),
+            new HasClaim('id'),
+            new HasClaim('role'),
+            new IdentifiedBy($conf['jti']),
+        ];
+
+        $validator = new Validator();
+        try {
+            $validator->assert($token, ...$constraints);
+        } catch (Throwable $e) {
+            errorLog($e);
+            throw new UnauthorizedException('Invalid token');
+        }
+
+        if (! $token->isIdentifiedBy($conf['jti']) || ! $token->hasBeenIssuedBy($issuedBy)) {
+            throw new UnauthorizedException('Token not mismatched');
+        }
+
+        if ($token->isExpired(datetime()->toNative())) {
+            throw new UnauthorizedException('Token expired');
+        }
+    }
+
+    /**
+     * @param $user
+     * @return array
+     */
+    public static function userResponse($user): array
+    {
+        return [
+            'user_id' => (int) $user['user_id'],
+            'first_name' => $user['first_name'],
+            'last_name' => $user['last_name'],
+            'email' => $user['email'],
+            'role' => $user['role'],
+            'points' => (int) $user['points'],
+            'book_count' => (int) $user['book_count'],
+        ];
+    }
+
+    /**
      * @param $data
      * @return void
      * @throws UnprocessableEntitiesException
+     * @throws BadRequestException
      */
     public function register($data): void
     {
@@ -109,7 +212,7 @@ class AuthService
             errorLog($e);
 
             if ($e->getCode() === 1062) {
-                throw new UnprocessableEntitiesException(CoreConstants::VALIDATION_MESSAGE, [
+                throw new BadRequestException(CoreConstants::VALIDATION_MESSAGE, [
                     'email' => 'Email already exists.',
                 ]);
             }
@@ -142,20 +245,20 @@ class AuthService
     /**
      * @param $data
      * @return array
-     * @throws UnprocessableEntitiesException
+     * @throws BadRequestException
      */
     public function login($data): array
     {
         $user = $this->user->getByEmail($data['email']);
 
         if (! $user || ! self::checkPassword($data['password'], $user['password'])) {
-            throw new UnprocessableEntitiesException(CoreConstants::VALIDATION_MESSAGE, [
+            throw new BadRequestException(CoreConstants::VALIDATION_MESSAGE, [
                 'email' => 'Email or password is incorrect.',
             ]);
         }
 
         if ($user['status'] === Constants::TYPE_USER_INACTIVE) {
-            throw new UnprocessableEntitiesException(CoreConstants::VALIDATION_MESSAGE, [
+            throw new BadRequestException(CoreConstants::VALIDATION_MESSAGE, [
                 'email' => 'Email is not verified.',
             ]);
         }
@@ -164,15 +267,18 @@ class AuthService
 
         return [
             'token' => $token,
-            'user' => [
-                'user_id' => (int) $user['user_id'],
-                'first_name' => $user['first_name'],
-                'last_name' => $user['last_name'],
-                'email' => $user['email'],
-                'role' => $user['role'],
-                'points' => (int) $user['points'],
-                'book_count' => (int) $user['book_count'],
-            ],
+            'user' => self::userResponse($user),
         ];
+    }
+
+    /**
+     * @param $id
+     * @return array
+     */
+    public function me($id): array
+    {
+        $user = $this->user->getById($id);
+
+        return self::userResponse($user);
     }
 }

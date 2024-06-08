@@ -19,6 +19,17 @@ class UserRepository extends AbstractRepository
     }
 
     /**
+     * Get user by id.
+     *
+     * @param int $id
+     * @return mixed
+     */
+    public function getById(int $id): mixed
+    {
+        return $this->db->queryFirstRow('SELECT * FROM users where user_id = %s', $id);
+    }
+
+    /**
      * Get user by email.
      *
      * @param string $email
