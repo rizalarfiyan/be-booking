@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controllers\Auth;
 
-use Booking\Constants;
+use Booking\Message\StatusCodeInterface as StatusCode;
+use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Respect\Validation\Validator as v;
-use Exception;
-use Booking\Message\StatusCodeInterface as StatusCode;
 
 class PostRegister extends BaseAuthController
 {
@@ -31,18 +30,8 @@ class PostRegister extends BaseAuthController
             ->keyValue('password_confirmation', 'equals', 'password');
 
         $validation->assert($data);
+        $this->auth->register($data);
 
-        try {
-            $this->auth->register($data);
-        } catch (Exception $e) {
-            if ($e->getCode() === 1062) {
-                return $this->sendJson([
-                    'email' => 'Email already exists.'
-                ], StatusCode::STATUS_UNPROCESSABLE_ENTITY, Constants::VALIDATION_MESSAGE);
-            }
-            throw $e;
-        }
-
-        return $this->sendJson(null, StatusCode::STATUS_CREATED, "User registered successfully.");
+        return $this->sendJson(null, StatusCode::STATUS_CREATED, 'User registered successfully.');
     }
 }

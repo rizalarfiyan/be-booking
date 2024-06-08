@@ -6,5 +6,5 @@ namespace Booking;
 
 interface Constants
 {
-    public const VALIDATION_MESSAGE = "Error validations";
+    public const VALIDATION_MESSAGE = 'Error validations';
 }

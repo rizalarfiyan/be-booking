@@ -18,41 +18,50 @@ class ExceptionHandler
      * @return ResponseInterface
      */
     public static function handle(
-        Throwable $t,
+        Throwable              $t,
         ServerRequestInterface $request,
-        bool $isProd
-    ): ResponseInterface {
+        bool                   $isProd
+    ): ResponseInterface
+    {
         switch ($t) {
+            case $t instanceof BaseApiException:
+                $data = [
+                    'message' => $t->getMessage(),
+                    'code' => $t->getCode(),
+                    'data' => $t->getData(),
+                ];
+
+                break;
             case $t instanceof NotFoundException:
             case $t instanceof NotFoundHttpException:
                 $data = [
-                    'type'      => get_class($t),
-                    'message'   => $t->getMessage(),
-                    'code'      => 404,
+                    'type' => get_class($t),
+                    'message' => $t->getMessage(),
+                    'code' => 404,
                 ];
 
                 break;
             case $t instanceof NotAllowedHttpException:
                 $data = [
-                    'type'      => get_class($t),
-                    'message'   => $t->getMessage(),
-                    'code'      => 405,
+                    'type' => get_class($t),
+                    'message' => $t->getMessage(),
+                    'code' => 405,
                 ];
 
                 break;
             case $t instanceof UnauthorizedException:
                 $data = [
-                    'type'      => get_class($t),
-                    'message'   => $t->getMessage(),
-                    'code'      => 401,
+                    'type' => get_class($t),
+                    'message' => $t->getMessage(),
+                    'code' => 401,
                 ];
 
                 break;
             case $t instanceof ValidationException:
                 $data = [
-                    'type'      => get_class($t),
-                    'message'   => Constants::VALIDATION_MESSAGE,
-                    'code'      => 422,
+                    'type' => get_class($t),
+                    'message' => Constants::VALIDATION_MESSAGE,
+                    'code' => 422,
                     'data' => (function ($t) {
                         return $t->getMessages();
                     })($t),
@@ -62,15 +71,15 @@ class ExceptionHandler
 
             default:
                 $data = [
-                    'type'      => get_class($t),
-                    'message'   => $t->getMessage(),
-                    'code'      => 500,
+                    'type' => get_class($t),
+                    'message' => $t->getMessage(),
+                    'code' => 500,
                 ];
 
                 break;
         }
 
-        if (! $isProd && $data['code'] != 422) {
+        if (!$isProd && $data['code'] != 422) {
             $data['trace'] = $t->getTrace();
         }
 

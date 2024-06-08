@@ -4,7 +4,7 @@ namespace Booking\Exception;
 
 use Exception;
 
-class NotFoundException extends BaseException
+class NotFoundException extends BaseApiException
 {
     /**
      * @param ?string $message

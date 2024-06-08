@@ -6,7 +6,7 @@ namespace Booking\Repository;
 
 use MeekroDB;
 
-abstract class AbstractRepository implements RepositoryInterface
+abstract class AbstractRepository
 {
     /**
      * @var MeekroDB
@@ -18,9 +18,24 @@ abstract class AbstractRepository implements RepositoryInterface
         $this->init();
     }
 
-    public function init(): void
+    /**
+     * Initialize the database connection.
+     *
+     * @return void
+     */
+    protected function init(): void
     {
         $conf = config('db');
         $this->db = new MeekroDB($conf['host'], $conf['user'], $conf['password'], $conf['name'], $conf['port']);
+    }
+
+    /**
+     * Get meekrodb instance.
+     *
+     * @return MeekroDB
+     */
+    public function db(): MeekroDB
+    {
+        return $this->db;
     }
 }

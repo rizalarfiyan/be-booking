@@ -4,7 +4,7 @@ namespace Booking\Exception;
 
 use Exception;
 
-class UnauthorizedException extends BaseException
+class UnauthorizedException extends BaseApiException
 {
     /**
      * @param ?string    $message

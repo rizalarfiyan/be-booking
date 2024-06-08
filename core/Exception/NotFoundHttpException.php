@@ -5,7 +5,7 @@ namespace Booking\Exception;
 use Exception;
 use Psr\Http\Message\ServerRequestInterface;
 
-class NotFoundHttpException extends BaseException
+class NotFoundHttpException extends BaseApiException
 {
     /**
      * @param ServerRequestInterface $request

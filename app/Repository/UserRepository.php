@@ -8,18 +8,46 @@ use Booking\Repository\AbstractRepository;
 
 class UserRepository extends AbstractRepository
 {
-    public function getAll()
+    /**
+     * Get all users
+     *
+     * @return mixed
+     */
+    public function getAll(): mixed
     {
         return $this->db->query('SELECT * FROM users');
     }
 
-    public function insert($payload)
+    /**
+     * Insert user
+     *
+     * @param $payload
+     * @return int return the id of the inserted user
+     */
+    public function insert($payload): int
     {
-        return $this->db->insert('users', [
+        $this->db->insert('users', [
             'email' => $payload['email'],
             'first_name' => $payload['first_name'],
             'last_name' => $payload['last_name'],
             'password' => $payload['password'],
         ]);
+        return $this->db->insertId();
+    }
+
+    /**
+     * Insert user verifications
+     *
+     * @param $payload
+     * @return int return the id of the inserted verification
+     */
+    public function insertVerifications($payload): int
+    {
+        $this->db->insert('verifications', [
+            'user_id' => $payload['user_id'],
+            'code' => $payload['code'],
+            'type' => $payload['type'],
+        ]);
+        return $this->db->insertId();
     }
 }
