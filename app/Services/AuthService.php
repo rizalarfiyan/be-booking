@@ -360,7 +360,7 @@ class AuthService
             $mail->addAddress($email, $fullName);
             $mail->isHTML();
             $mail->Subject = 'Reset Password';
-            $mail->Body = $mailer->getTemplate('verification', [
+            $mail->Body = $mailer->getTemplate('reset_password', [
                 'name' => $fullName,
                 'url' => $url,
             ]);
