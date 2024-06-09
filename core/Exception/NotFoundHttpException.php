@@ -2,10 +2,11 @@
 
 namespace Booking\Exception;
 
+use Booking\Message\StatusCodeInterface as StatusCode;
 use Exception;
 use Psr\Http\Message\ServerRequestInterface;
 
-class NotFoundHttpException extends BaseException
+class NotFoundHttpException extends BaseApiException
 {
     /**
      * @param ServerRequestInterface $request
@@ -17,6 +18,6 @@ class NotFoundHttpException extends BaseException
         $path = $request->getUri()->getPath();
         $message = "Method {$method} was not found in path {$path}";
 
-        parent::__construct($message, 404, $previous);
+        parent::__construct($message, StatusCode::STATUS_NOT_FOUND, $previous);
     }
 }

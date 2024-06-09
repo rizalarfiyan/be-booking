@@ -2,6 +2,8 @@
 
 namespace Booking\Exception;
 
+use Booking\Constants;
+use Booking\Message\StatusCodeInterface as StatusCode;
 use Booking\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -17,56 +19,39 @@ class ExceptionHandler
      * @return ResponseInterface
      */
     public static function handle(
-        Throwable $t,
+        Throwable              $t,
         ServerRequestInterface $request,
-        bool $isProd
-    ): ResponseInterface {
+        bool                   $isProd
+    ): ResponseInterface
+    {
         switch ($t) {
-            case $t instanceof NotFoundException:
-            case $t instanceof NotFoundHttpException:
+            case $t instanceof BaseApiException:
                 $data = [
-                    'type'      => get_class($t),
-                    'message'   => $t->getMessage(),
-                    'code'      => 404,
+                    'message' => $t->getMessage(),
+                    'code' => $t->getCode(),
+                    'data' => $t->getData(),
                 ];
 
                 break;
-            case $t instanceof NotAllowedHttpException:
-                $data = [
-                    'type'      => get_class($t),
-                    'message'   => $t->getMessage(),
-                    'code'      => 405,
-                ];
 
-                break;
-            case $t instanceof UnauthorizedException:
-                $data = [
-                    'type'      => get_class($t),
-                    'message'   => $t->getMessage(),
-                    'code'      => 401,
-                ];
-
-                break;
             case $t instanceof ValidationException:
                 $data = [
-                    'type'      => get_class($t),
-                    'message'   => (function ($t) {
-                        $messages = explode('- ', $t->getFullMessage());
-                        $messages = array_unique(array_filter($messages));
-                        $messages = array_values(array_map('trim', $messages));
-
-                        return $messages;
+                    'type' => get_class($t),
+                    'message' => Constants::VALIDATION_MESSAGE,
+                    'code' => StatusCode::STATUS_BAD_REQUEST,
+                    'data' => (function ($t) {
+                        return $t->getMessages();
                     })($t),
-                    'code'      => 422,
                 ];
 
                 break;
 
             default:
                 $data = [
-                    'type'      => get_class($t),
-                    'message'   => $t->getMessage(),
-                    'code'      => 500,
+                    'type' => get_class($t),
+                    'message' => $t->getMessage(),
+                    'code' => 500,
+                    'data' => null,
                 ];
 
                 break;

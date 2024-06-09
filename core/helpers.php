@@ -32,8 +32,9 @@ if (! function_exists('datetime')) {
      */
     function datetime(
         ChronosDate|ChronosTime|DateTimeInterface|string|int|null $time = 'now',
-        DateTimeZone|string|null $timezone = null
-    ): Chronos {
+        DateTimeZone|string|null                                  $timezone = null
+    ): Chronos
+    {
         return new Chronos($time, $timezone);
     }
 }
@@ -46,7 +47,7 @@ if (! function_exists('is_production')) {
      */
     function is_production(): bool
     {
-        return (bool) config('app.env') == 'production';
+        return Config::getInstance()->get('app.env') == 'production';
     }
 }
 
@@ -129,5 +130,44 @@ if (! function_exists('infoLog')) {
 
         $file = __DIR__.'/../log/info.log';
         file_put_contents($file, $message.PHP_EOL, FILE_APPEND | LOCK_EX);
+    }
+}
+
+if (! function_exists('fullName')) {
+    /**
+     * Get full name based on first name and last name.
+     *
+     * @param string $firstName
+     * @param string|null $lastName
+     * @return string
+     */
+    function fullName(string $firstName, string $lastName = null): string
+    {
+        if (! $lastName) return $firstName;
+
+        return "$firstName $lastName";
+    }
+}
+
+
+if (! function_exists('randomStr')) {
+    /**
+     * Generate random string with length.
+     *
+     * @param int $length
+     * @return string
+     */
+    function randomStr(int $length = 50): string
+    {
+        try {
+            $random = bin2hex(random_bytes($length));
+            if (strlen($random) > $length) {
+                return substr($random, 0, $length);
+            }
+
+            return $random;
+        } catch (Exception) {
+            return md5(uniqid(rand().microtime(), true));
+        }
     }
 }

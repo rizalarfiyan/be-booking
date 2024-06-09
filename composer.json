@@ -18,7 +18,8 @@
     }
   ],
   "config": {
-    "optimize-autoloader": true
+    "optimize-autoloader": true,
+    "process-timeout": 0
   },
   "require-dev": {
     "symfony/var-dumper": "^7.1",
@@ -38,9 +39,14 @@
     "sergeytsalkov/meekrodb": "^2.5",
     "symfony/dotenv": "^7.1",
     "cakephp/chronos": "^3.0",
-    "illuminate/collections": "^11.9"
+    "illuminate/collections": "^11.9",
+    "phpmailer/phpmailer": "^6.9",
+    "lcobucci/jwt": "^5.3"
   },
   "scripts": {
+    "post-root-package-install": [
+      "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+    ],
     "cs-check": "phpcs",
     "check-style": "./vendor/bin/php-cs-fixer fix --dry-run --diff",
     "fix-style": "./vendor/bin/php-cs-fixer fix --verbose --show-progress=dots",
@@ -50,6 +56,8 @@
     "migration:up": "php ./core/command.php migration:up",
     "migration:down": "php ./core/command.php migration:down",
     "migration:update": "php ./core/command.php migration:update",
-    "migration:version": "php ./core/command.php migration:version"
+    "migration:version": "php ./core/command.php migration:version",
+    "dev": "php -S localhost:8081 -t ./public",
+    "log": "tail -f ./log/db.log ./log/errors.log ./log/info.log"
   }
 }

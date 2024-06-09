@@ -6,6 +6,7 @@ namespace App\Controllers\Home;
 
 use App\Controllers\Controller;
 use App\Repository\UserRepository;
+use App\Services\AuthService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -26,7 +27,7 @@ class GetHomePage extends Controller
                 'page' => $this->getCurrentPage($req),
                 'size' => $this->getPageSize($req),
                 'users' => collect($userRepository->getAll())->map(function ($user) {
-                    return collect($user)->only(['id', 'name', 'email', 'created_at', 'updated_at']);
+                    return collect($user)->only(['user_id', 'first_name', 'last_name', 'email', 'status', 'role']);
                 }),
             ],
         ];
