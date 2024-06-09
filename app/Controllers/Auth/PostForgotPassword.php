@@ -13,8 +13,6 @@ use Respect\Validation\Validator as v;
 class PostForgotPassword extends BaseAuthController
 {
     /**
-     * Get Home Page Api.
-     *
      * @param ServerRequestInterface $req
      * @return ResponseInterface
      * @throws Exception

@@ -13,8 +13,6 @@ use Respect\Validation\Validator as v;
 class PostLogin extends BaseAuthController
 {
     /**
-     * Get Home Page Api.
-     *
      * @param ServerRequestInterface $req
      * @return ResponseInterface
      * @throws Exception

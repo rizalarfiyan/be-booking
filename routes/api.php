@@ -16,4 +16,8 @@ $router->group('/api/v1/', function ($router) {
         $router->post('/activation', App\Controllers\Auth\PostActivation::class);
         $router->get('/me', App\Controllers\Auth\GetMe::class, [$auth]);
     });
+
+    $router->group('/contact', function ($router) {
+        $router->post('/', App\Controllers\Contact\PostNewContact::class);
+    });
 });

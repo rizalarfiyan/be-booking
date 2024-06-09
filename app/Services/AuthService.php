@@ -41,7 +41,7 @@ class AuthService
     protected VerificationRepository $verification;
 
     /**
-     * @param UserRepository $repo
+     * @param BaseRepository $repo
      */
     public function __construct(BaseRepository $repo)
     {
@@ -216,7 +216,7 @@ class AuthService
                 'code' => $code,
                 'expired_at' => datetime()->addHours(1)->format('Y-m-d H:i:s'),
             ];
-            $this->verification->insertVerifications($verification);
+            $this->verification->insert($verification);
             $this->repo->commit();
         } catch (Throwable $e) {
             $this->repo->rollback();
@@ -349,7 +349,7 @@ class AuthService
             'code' => $code,
             'expired_at' => datetime()->addHours(1)->format('Y-m-d H:i:s'),
         ];
-        $this->verification->insertVerifications($verification);
+        $this->verification->insert($verification);
 
         try {
             $fullName = fullName($user['first_name'], $user['last_name']);

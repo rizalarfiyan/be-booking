@@ -26,7 +26,7 @@ class VerificationRepository extends BaseRepository
      * @param $payload
      * @return int return the id of the inserted verification
      */
-    public function insertVerifications($payload): int
+    public function insert($payload): int
     {
         $this->db->insert('verifications', [
             'user_id' => $payload['user_id'],
