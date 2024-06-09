@@ -371,4 +371,33 @@ class AuthService
             throw new UnprocessableEntitiesException('Could not be sent email, please contact administrator.');
         }
     }
+
+    /**
+     * @param $data
+     * @return void
+     * @throws BadRequestException
+     * @throws UnprocessableEntitiesException
+     */
+    public function changePassword($data): void
+    {
+        $code = $data['code'];
+        $password = $data['password'];
+
+        $data = $this->verification->getByCode($code);
+        if ($this->isNotValidVerification($data, Constants::TYPE_VERIFICATION_FORGOT_PASSWORD)) {
+            throw new BadRequestException('Invalid change password code.');
+        }
+
+        try {
+            $userId = (int) $data['user_id'];
+            $this->repo->startTransaction();
+            $this->user->updatePassword(self::hashPassword($password), $userId);
+            $this->verification->deleteByTypeAndUser(Constants::TYPE_VERIFICATION_FORGOT_PASSWORD, $userId);
+            $this->repo->commit();
+        } catch (Throwable $e) {
+            $this->repo->rollback();
+            errorLog($e);
+            throw new UnprocessableEntitiesException('Password could not be changed, please contact administrator.');
+        }
+    }
 }

@@ -73,4 +73,17 @@ class UserRepository extends BaseRepository
             'status' => $status,
         ], 'user_id=%s', $userId);
     }
+
+    /**
+     * @param string $password
+     * @param int $userId
+     * @return mixed
+     * @throws MeekroDBException
+     */
+    public function updatePassword(string $password, int $userId): mixed
+    {
+        return $this->db->update('users', [
+            'password' => $password,
+        ], 'user_id=%s', $userId);
+    }
 }
