@@ -23,6 +23,7 @@ class Jwt implements MiddlewareInterface
     {
         $token = AuthService::getAuthToken($request);
         AuthService::validateToken($token);
+
         return $handler->handle($request);
     }
 }

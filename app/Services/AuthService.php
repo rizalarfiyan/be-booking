@@ -24,11 +24,10 @@ use Lcobucci\JWT\Validation\Constraint\HasClaim;
 use Lcobucci\JWT\Validation\Constraint\IdentifiedBy;
 use Lcobucci\JWT\Validation\Constraint\SignedWith;
 use Lcobucci\JWT\Validation\Validator;
+use MeekroDB;
 use PHPMailer\PHPMailer\Exception;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
-use MeekroDB;
-use MeekroDBException;
 
 class AuthService
 {
@@ -114,7 +113,7 @@ class AuthService
     public static function getAuthToken(ServerRequestInterface $request): Token
     {
         $authorization = $request->getHeaderLine('Authorization');
-        if (!$authorization) {
+        if (! $authorization) {
             throw new UnauthorizedException('Token not present');
         }
 
@@ -171,7 +170,7 @@ class AuthService
             throw new UnauthorizedException('Invalid token');
         }
 
-        if (!$token->isIdentifiedBy($conf['jti']) || !$token->hasBeenIssuedBy($issuedBy)) {
+        if (! $token->isIdentifiedBy($conf['jti']) || ! $token->hasBeenIssuedBy($issuedBy)) {
             throw new UnauthorizedException('Token not mismatched');
         }
 
@@ -187,13 +186,13 @@ class AuthService
     public static function userResponse($user): array
     {
         return [
-            'user_id' => (int)$user['user_id'],
+            'user_id' => (int) $user['user_id'],
             'first_name' => $user['first_name'],
             'last_name' => $user['last_name'],
             'email' => $user['email'],
             'role' => $user['role'],
-            'points' => (int)$user['points'],
-            'book_count' => (int)$user['book_count'],
+            'points' => (int) $user['points'],
+            'book_count' => (int) $user['book_count'],
         ];
     }
 
@@ -234,7 +233,7 @@ class AuthService
 
         try {
             $fullName = fullName($data['first_name'], $data['last_name']);
-            $url = config('url.activation') . '?code=' . $code;
+            $url = config('url.activation').'?code='.$code;
 
             $mailer = new Mailer();
             $mail = $mailer->getMail();
@@ -249,7 +248,7 @@ class AuthService
             $mail->send();
         } catch (Exception $e) {
             errorLog($e);
-            throw new UnprocessableEntitiesException('Message could not be sent, please contact administrator.');
+            throw new UnprocessableEntitiesException('Could not be sent email, please contact administrator.');
         }
     }
 
@@ -262,7 +261,7 @@ class AuthService
     {
         $user = $this->user->getByEmail($data['email']);
 
-        if (!$user || !self::checkPassword($data['password'], $user['password'])) {
+        if (! $user || ! self::checkPassword($data['password'], $user['password'])) {
             throw new BadRequestException(CoreConstants::VALIDATION_MESSAGE, [
                 'email' => 'Email or password is incorrect.',
             ]);
@@ -274,7 +273,7 @@ class AuthService
             ]);
         }
 
-        $token = self::generateToken((int)$user['user_id'], $user['role']);
+        $token = self::generateToken((int) $user['user_id'], $user['role']);
 
         return [
             'token' => $token,
@@ -302,7 +301,7 @@ class AuthService
      */
     protected function isNotValidVerification($data, string $type): bool
     {
-        return !$data || $data['type'] !== $type || datetime($data['expired_at'])->isPast();
+        return ! $data || $data['type'] !== $type || datetime($data['expired_at'])->isPast();
     }
 
     /**
@@ -319,7 +318,7 @@ class AuthService
         }
 
         try {
-            $userId = (int)$data['user_id'];
+            $userId = (int) $data['user_id'];
             $this->repo->startTransaction();
             $this->user->updateStatus(Constants::TYPE_USER_ACTIVE, $userId);
             $this->verification->deleteByTypeAndUser(Constants::TYPE_VERIFICATION_ACTIVATION, $userId);
@@ -328,6 +327,48 @@ class AuthService
             $this->repo->rollback();
             errorLog($e);
             throw new UnprocessableEntitiesException('User could not be activated, please contact administrator.');
+        }
+    }
+
+    /**
+     * @param string $email
+     * @return void
+     * @throws UnprocessableEntitiesException
+     */
+    public function forgotPassword(string $email): void
+    {
+        $user = $this->user->getByEmail($email);
+        if (! $user) {
+            return;
+        }
+
+        $code = randomStr();
+        $verification = [
+            'user_id' => (int) $user['user_id'],
+            'type' => Constants::TYPE_VERIFICATION_FORGOT_PASSWORD,
+            'code' => $code,
+            'expired_at' => datetime()->addHours(1)->format('Y-m-d H:i:s'),
+        ];
+        $this->verification->insertVerifications($verification);
+
+        try {
+            $fullName = fullName($user['first_name'], $user['last_name']);
+            $url = config('url.change_password').'?code='.$code;
+
+            $mailer = new Mailer();
+            $mail = $mailer->getMail();
+            $mail->addAddress($email, $fullName);
+            $mail->isHTML();
+            $mail->Subject = 'Reset Password';
+            $mail->Body = $mailer->getTemplate('verification', [
+                'name' => $fullName,
+                'url' => $url,
+            ]);
+            $mail->AltBody = "Hi $fullName, Please reset your password by clicking the link below: $url";
+            $mail->send();
+        } catch (Exception $e) {
+            errorLog($e);
+            throw new UnprocessableEntitiesException('Could not be sent email, please contact administrator.');
         }
     }
 }

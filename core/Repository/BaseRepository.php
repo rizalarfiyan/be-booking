@@ -13,17 +13,18 @@ class BaseRepository
      */
     public MeekroDB $db;
 
-    public function __construct(Meekrodb $db = null)
+    public function __construct(MeekroDB $db = null)
     {
         if ($db) {
             $this->db = $db;
+
             return;
         }
 
         $conf = config('db');
         $this->db = new MeekroDB($conf['host'], $conf['user'], $conf['password'], $conf['name'], $conf['port']);
-        if (!is_production()) {
-            $this->db->logfile = __DIR__ . '/../../log/db.log';
+        if (! is_production()) {
+            $this->db->logfile = __DIR__.'/../../log/db.log';
         }
     }
 
