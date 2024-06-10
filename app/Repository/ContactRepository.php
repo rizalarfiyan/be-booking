@@ -17,8 +17,8 @@ class ContactRepository extends BaseRepository
     public function insert($payload): int
     {
         $this->db->insert('contacts', [
-            'first_name' => $payload['first_name'],
-            'last_name' => $payload['last_name'] ?? '',
+            'first_name' => $payload['firstName'],
+            'last_name' => $payload['lastName'] ?? '',
             'email' => $payload['email'],
             'phone' => $payload['phone'],
             'message' => $payload['message'],

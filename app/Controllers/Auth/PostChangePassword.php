@@ -27,7 +27,7 @@ class PostChangePassword extends BaseAuthController
         }
 
         $validation = v::key('password', v::stringType()->length(6, 36))
-            ->keyValue('password_confirmation', 'equals', 'password');
+            ->keyValue('passwordConfirmation', 'equals', 'password');
 
         $validation->assert($data);
         $this->auth->changePassword($data);

@@ -22,7 +22,8 @@ class PostLogin extends BaseAuthController
         $data = $this->parseRequestDataToArray($req);
 
         $validation = v::key('email', v::email()->noWhitespace())
-            ->key('password', v::stringType());
+            ->key('password', v::stringType())
+            ->key('isRemember', v::boolVal());
 
         $validation->assert($data);
         $data = $this->auth->login($data);
