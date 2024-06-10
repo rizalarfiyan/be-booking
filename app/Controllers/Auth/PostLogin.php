@@ -13,8 +13,6 @@ use Respect\Validation\Validator as v;
 class PostLogin extends BaseAuthController
 {
     /**
-     * Get Home Page Api.
-     *
      * @param ServerRequestInterface $req
      * @return ResponseInterface
      * @throws Exception
@@ -24,7 +22,8 @@ class PostLogin extends BaseAuthController
         $data = $this->parseRequestDataToArray($req);
 
         $validation = v::key('email', v::email()->noWhitespace())
-            ->key('password', v::stringType());
+            ->key('password', v::stringType())
+            ->key('isRemember', v::boolVal());
 
         $validation->assert($data);
         $data = $this->auth->login($data);

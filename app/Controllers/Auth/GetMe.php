@@ -12,8 +12,6 @@ use Psr\Http\Message\ServerRequestInterface;
 class GetMe extends BaseAuthController
 {
     /**
-     * Get Home Page Api.
-     *
      * @param ServerRequestInterface $req
      * @return ResponseInterface
      * @throws Exception

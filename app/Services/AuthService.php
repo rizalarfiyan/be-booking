@@ -41,7 +41,7 @@ class AuthService
     protected VerificationRepository $verification;
 
     /**
-     * @param UserRepository $repo
+     * @param BaseRepository $repo
      */
     public function __construct(BaseRepository $repo)
     {
@@ -80,9 +80,10 @@ class AuthService
      *
      * @param int $id
      * @param string $role
+     * @param bool $isRemember
      * @return string
      */
-    public static function generateToken(int $id, string $role): string
+    public static function generateToken(int $id, string $role, bool $isRemember = false): string
     {
         $conf = config('jwt');
         $issuedBy = config('app.url');
@@ -91,13 +92,16 @@ class AuthService
         $algorithm = new Sha256();
         $signingKey = InMemory::plainText($conf['secret']);
 
+        $ttl = $conf['ttl'];
+        if ($isRemember) $ttl *= 2;
+
         $token = $tokenBuilder
             ->issuedBy($issuedBy)
             ->identifiedBy($conf['jti'])
             ->withClaim('id', $id)
             ->withClaim('role', $role)
             ->issuedAt(datetime()->toNative())
-            ->expiresAt(datetime()->addSeconds($conf['ttl'])->toNative())
+            ->expiresAt(datetime()->addSeconds($ttl)->toNative())
             ->getToken($algorithm, $signingKey);
 
         return $token->toString();
@@ -186,13 +190,14 @@ class AuthService
     public static function userResponse($user): array
     {
         return [
-            'user_id' => (int) $user['user_id'],
-            'first_name' => $user['first_name'],
-            'last_name' => $user['last_name'],
+            'userId' => (int) $user['user_id'],
+            'firstName' => $user['first_name'],
+            'lastName' => $user['last_name'] ?? '',
             'email' => $user['email'],
             'role' => $user['role'],
+            'avatar' => '',
             'points' => (int) $user['points'],
-            'book_count' => (int) $user['book_count'],
+            'bookCount' => (int) $user['book_count'],
         ];
     }
 
@@ -211,12 +216,12 @@ class AuthService
             $this->repo->startTransaction();
             $userId = $this->user->insert($data);
             $verification = [
-                'user_id' => $userId,
+                'userId' => $userId,
                 'type' => Constants::TYPE_VERIFICATION_ACTIVATION,
                 'code' => $code,
-                'expired_at' => datetime()->addHours(1)->format('Y-m-d H:i:s'),
+                'expiredAt' => datetime()->addHours(1)->format('Y-m-d H:i:s'),
             ];
-            $this->verification->insertVerifications($verification);
+            $this->verification->insert($verification);
             $this->repo->commit();
         } catch (Throwable $e) {
             $this->repo->rollback();
@@ -232,7 +237,7 @@ class AuthService
         }
 
         try {
-            $fullName = fullName($data['first_name'], $data['last_name']);
+            $fullName = fullName($data['firstName'], $data['lastName']);
             $url = config('url.activation').'?code='.$code;
 
             $mailer = new Mailer();
@@ -256,6 +261,7 @@ class AuthService
      * @param $data
      * @return array
      * @throws BadRequestException
+     * @throws UnprocessableEntitiesException
      */
     public function login($data): array
     {
@@ -268,12 +274,10 @@ class AuthService
         }
 
         if ($user['status'] === Constants::TYPE_USER_INACTIVE) {
-            throw new BadRequestException(CoreConstants::VALIDATION_MESSAGE, [
-                'email' => 'Email is not verified.',
-            ]);
+            throw new UnprocessableEntitiesException('Email is not verified. Please check your email and verify.');
         }
 
-        $token = self::generateToken((int) $user['user_id'], $user['role']);
+        $token = self::generateToken((int) $user['user_id'], $user['role'], $data['isRemember']);
 
         return [
             'token' => $token,
@@ -344,12 +348,12 @@ class AuthService
 
         $code = randomStr();
         $verification = [
-            'user_id' => (int) $user['user_id'],
+            'userId' => (int) $user['user_id'],
             'type' => Constants::TYPE_VERIFICATION_FORGOT_PASSWORD,
             'code' => $code,
-            'expired_at' => datetime()->addHours(1)->format('Y-m-d H:i:s'),
+            'expiredAt' => datetime()->addHours(1)->format('Y-m-d H:i:s'),
         ];
-        $this->verification->insertVerifications($verification);
+        $this->verification->insert($verification);
 
         try {
             $fullName = fullName($user['first_name'], $user['last_name']);
@@ -375,7 +379,6 @@ class AuthService
     /**
      * @param $data
      * @return void
-     * @throws BadRequestException
      * @throws UnprocessableEntitiesException
      */
     public function changePassword($data): void
@@ -385,7 +388,7 @@ class AuthService
 
         $data = $this->verification->getByCode($code);
         if ($this->isNotValidVerification($data, Constants::TYPE_VERIFICATION_FORGOT_PASSWORD)) {
-            throw new BadRequestException('Invalid change password code.');
+            throw new UnprocessableEntitiesException('Invalid change password code. Please check email and try again.');
         }
 
         try {
