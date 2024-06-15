@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Repository\ContactRepository;
+use Booking\Exception\NotFoundException;
 use Booking\Exception\UnprocessableEntitiesException;
 use Booking\Repository\BaseRepository;
 use MeekroDB;
@@ -35,7 +36,7 @@ class ContactService
     public static function response($contact, bool $withMessage = false): array
     {
         $data = [
-            'contactId' => (int)$contact['contact_id'],
+            'contactId' => (int) $contact['contact_id'],
             'firstName' => $contact['first_name'],
             'lastName' => $contact['last_name'] ?? '',
             'email' => $contact['email'],
@@ -68,7 +69,7 @@ class ContactService
     }
 
     /**
-     * Insert submitted contact form.
+     * Get all contacts.
      *
      * @param $payload
      * @return mixed
@@ -78,12 +79,36 @@ class ContactService
     {
         try {
             return [
-                'content' => collect($this->user->getAll($payload))->map(fn($contact) => self::response($contact)),
+                'content' => collect($this->user->getAll($payload))->map(fn ($contact) => self::response($contact)),
                 'total' => $this->user->countAll($payload),
             ];
         } catch (Throwable $t) {
             errorLog($t);
             throw new UnprocessableEntitiesException('Failed to get all contacts.');
         }
+    }
+
+    /**
+     * Get contact detail.
+     *
+     * @param int $id
+     * @return array
+     * @throws UnprocessableEntitiesException
+     * @throws NotFoundException
+     */
+    public function getDetail(int $id): array
+    {
+        try {
+            $contact = $this->user->getById($id);
+        } catch (Throwable $t) {
+            errorLog($t);
+            throw new NotFoundException('Failed to get all contacts.');
+        }
+
+        if (! $contact) {
+            throw new UnprocessableEntitiesException('Contact not found.');
+        }
+
+        return self::response($contact, true);
     }
 }

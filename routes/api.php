@@ -20,6 +20,7 @@ $router->group('/api/v1/', function ($router) {
 
     $router->group('/contact', function ($router) use ($auth) {
         $router->get('/', App\Controllers\Contact\GetAll::class, [$auth]);
+        $router->get('/{id}', App\Controllers\Contact\GetDetail::class, [$auth]);
         $router->post('/', App\Controllers\Contact\PostNewContact::class);
     });
 });

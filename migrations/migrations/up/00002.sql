@@ -6,7 +6,7 @@ CREATE TABLE contacts
     last_name  VARCHAR(50)     NOT NULL DEFAULT '',
     email      VARCHAR(100)    NOT NULL,
     phone      VARCHAR(20)     NOT NULL,
-    message    VARCHAR(500)    NOT NULL,
+    message    VARCHAR(1000)   NOT NULL,
     is_read    BOOLEAN         NOT NULL DEFAULT FALSE,
     created_at DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP

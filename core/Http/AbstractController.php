@@ -31,21 +31,18 @@ abstract class AbstractController implements ControllerInterface
     public function getDatatable(ServerRequestInterface $request): array
     {
         $query = $request->getQueryParams();
-        $count = is_numeric($query['count']) ? (int) $query['count'] : null;
-        $page = is_numeric($query['page']) ? (int) $query['page'] : 0;
-
-        infoLog("COUNT => $count");
-        infoLog("PAGE => $page");
+        $count = isset($query['count']) ? is_numeric($query['count']) ? (int) $query['count'] : null : null;
+        $page = isset($query['page']) ? is_numeric($query['page']) ? (int) $query['page'] : 0 : 0;
 
         return [
             'page' => $page > 0 ? $page - 1 : 0,
-            'count' => !empty($count) ? $count : (int) config('app.count'),
+            'count' => ! empty($count) ? $count : (int) config('app.count'),
             'orderBy' => $query['orderBy'] ?? null,
             'orderType' => $query['orderType'] ?? null,
         ];
     }
 
-/**
+    /**
      * Array response for list data.
      *
      * @param array $content
@@ -57,6 +54,7 @@ abstract class AbstractController implements ControllerInterface
     {
         $total = $content['total'];
         infoLog(json_encode([$metadata['count'], $total]));
+
         return [
             'content' => $content['content'],
             'metadata' => [

@@ -35,10 +35,10 @@ class ContactRepository extends BaseRepository
     protected function baseGetAll($payload): WhereClause
     {
         $where = new WhereClause('or');
-        if (!empty($payload['search'])) {
-            $where->add("first_name like %s", "%{$payload['search']}%");
-            $where->add("last_name like %s", "%{$payload['search']}%");
-            $where->add("email like %s", "%{$payload['search']}%");
+        if (! empty($payload['search'])) {
+            $where->add('first_name like %s', "%{$payload['search']}%");
+            $where->add('last_name like %s', "%{$payload['search']}%");
+            $where->add('email like %s', "%{$payload['search']}%");
         }
 
         return $where;
@@ -74,6 +74,16 @@ class ContactRepository extends BaseRepository
     public function countAll($payload): int
     {
         $condition = $this->baseGetAll($payload);
-        return (int)$this->db->queryFirstField('SELECT COUNT(*) FROM contacts WHERE %l', $condition) ?? 0;
+
+        return (int) $this->db->queryFirstField('SELECT COUNT(*) FROM contacts WHERE %l', $condition) ?? 0;
+    }
+
+    /**
+     * @param int $id
+     * @return mixed
+     */
+    public function getById(int $id): mixed
+    {
+        return $this->db->queryFirstRow('SELECT * FROM contacts where contact_id = %s', $id);
     }
 }
