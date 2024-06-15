@@ -22,8 +22,8 @@ class PostNewContact extends BaseContactController
         $data = $this->parseRequestDataToArray($req);
 
         $validation = v::key('email', v::email()->noWhitespace())
-            ->key('first_name', v::alpha()->length(3, 50))
-            ->key('last_name', v::optional(v::alpha()->length(3, 50)))
+            ->key('firstName', v::alpha()->length(3, 50))
+            ->key('lastName', v::optional(v::alpha()->length(3, 50)))
             ->key('phone', v::stringType()->numericVal()->length(10, 20))
             ->key('message', v::stringType()->length(10, 500));
 
