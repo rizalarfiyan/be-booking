@@ -20,4 +20,13 @@ $router->group('/api/v1/', function ($router) {
     $router->group('/contact', function ($router) {
         $router->post('/', App\Controllers\Contact\PostNewContact::class);
     });
+
+    $router->group('/category', function ($router) {
+        $auth = App\Middlewares\Jwt::class;
+        // get by id using url path
+        $router->get('/{id}', App\Controllers\Category\GetCategoriesById::class, [$auth]);
+        $router->post('/', App\Controllers\Category\PostNewCategoryController::class, [$auth]);
+        $router->put('/{id}', App\Controllers\Category\UpdateCategoryController::class, [$auth]);
+        $router->delete('/{id}', App\Controllers\Category\DeleteCategoryController::class, [$auth]);
+     });
 });
