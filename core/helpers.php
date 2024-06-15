@@ -149,7 +149,6 @@ if (! function_exists('fullName')) {
     }
 }
 
-
 if (! function_exists('randomStr')) {
     /**
      * Generate random string with length.
@@ -169,5 +168,30 @@ if (! function_exists('randomStr')) {
         } catch (Exception) {
             return md5(uniqid(rand().microtime(), true));
         }
+    }
+}
+
+if (! function_exists('columnValidation')) {
+    /**
+     * Get column validation based on columns and column.
+     *
+     * @param array $columns
+     * @param ?string $column
+     * @param bool $caseSensitive
+     * @return ?string
+     */
+    function columnValidation(array $columns, ?string $column, bool $caseSensitive = false): ?string
+    {
+        if (empty($column)) return null;
+
+        if ($caseSensitive) {
+            $condition = in_array($column, $columns);
+        } else {
+            $condition = in_array(strtolower($column), array_map('strtolower', $columns));
+        }
+
+        if ($condition) return $column;
+
+        return null;
     }
 }

@@ -28,6 +28,29 @@ class ContactService
     }
 
     /**
+     * @param $contact
+     * @param bool $withMessage
+     * @return array
+     */
+    public static function response($contact, bool $withMessage = false): array
+    {
+        $data = [
+            'contactId' => (int)$contact['contact_id'],
+            'firstName' => $contact['first_name'],
+            'lastName' => $contact['last_name'] ?? '',
+            'email' => $contact['email'],
+            'phone' => $contact['phone'],
+            'submittedAt' => $contact['created_at'],
+        ];
+
+        if ($withMessage) {
+            $data['message'] = $contact['message'];
+        }
+
+        return $data;
+    }
+
+    /**
      * Insert submitted contact form.
      *
      * @param $payload
@@ -41,6 +64,26 @@ class ContactService
         } catch (Throwable $t) {
             errorLog($t);
             throw new UnprocessableEntitiesException('Failed to send contact.');
+        }
+    }
+
+    /**
+     * Insert submitted contact form.
+     *
+     * @param $payload
+     * @return mixed
+     * @throws UnprocessableEntitiesException
+     */
+    public function getAll($payload): mixed
+    {
+        try {
+            return [
+                'content' => collect($this->user->getAll($payload))->map(fn($contact) => self::response($contact)),
+                'total' => $this->user->countAll($payload),
+            ];
+        } catch (Throwable $t) {
+            errorLog($t);
+            throw new UnprocessableEntitiesException('Failed to get all contacts.');
         }
     }
 }

@@ -7,7 +7,7 @@ return [
     'port'     => getenv('APP_PORT') ?: 8080,
     'name'     => getenv('APP_NAME') ?: 'Booking',
     'cache_dir' => getenv('APP_CACHE_DIR') ?: __DIR__.'/../tmp',
-    'page_size' => 15,
+    'count' => 10,
     'timezone' => 'Asia/Jakarta',
     'locale' => 'id',
 ];
