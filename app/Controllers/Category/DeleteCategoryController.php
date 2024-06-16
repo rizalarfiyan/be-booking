@@ -18,7 +18,7 @@ class DeleteCategoryController extends BaseCategoryController
 {
     /**
      * @throws UnauthorizedException
-     * @throws MeekroDBException
+     * @throws UnprocessableEntitiesException
      */
     public function __invoke(int $id, ServerRequestInterface $req): ResponseInterface
     {

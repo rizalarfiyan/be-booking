@@ -6,17 +6,56 @@ namespace App\Repository;
 
 use Booking\Repository\BaseRepository;
 use MeekroDBException;
+use WhereClause;
 
 class CategoryRepository extends BaseRepository
 {
     /**
-     * Get all categories.
-     *
+     * @param $payload
+     * @return WhereClause
+     */
+    protected function baseGetAll($payload): WhereClause
+    {
+        $where = new WhereClause('or');
+        if (! empty($payload['search'])) {
+            $where->add('name like %s', "%{$payload['search']}%");
+        }
+
+        return $where;
+    }
+
+    /**
+     * @param $payload
      * @return mixed
      */
-    public function getAll(): mixed
+    public function getAll($payload): mixed
     {
-        return $this->db->query('SELECT * FROM categories');
+        $condition = $this->baseGetAll($payload);
+        $orderBy = columnValidation([
+            'category_id',
+            'name',
+            'slug',
+            'created_at',
+            'created_by',
+            'updated_at',
+            'updated_by',
+            'deleted_at',
+            'deleted_by',
+        ], $payload['orderType']) ?? 'created_at';
+        $orderType = columnValidation(['ASC', 'DESC'], $payload['orderType']) ?? 'ASC';
+
+        return $this->db->query('SELECT * FROM categories WHERE %l ORDER BY %l %l LIMIT %d OFFSET %d', $condition, $orderBy, $orderType, $payload['count'], $payload['page'] * $payload['count']);
+    }
+
+    /**
+     * @param $payload
+     * @return int
+     */
+    public function countAll($payload): int
+    {
+        $condition = $this->baseGetAll($payload);
+
+        return (int) $this->db->queryFirstField('SELECT COUNT(*) FROM categories WHERE %l', $condition) ?? 0;
     }
 
     /**
@@ -27,7 +66,7 @@ class CategoryRepository extends BaseRepository
      */
     public function getById(int $id): mixed
     {
-        return $this->db->queryFirstRow('SELECT * FROM categories where category_id = %s', $id);
+        return $this->db->queryFirstRow('SELECT * FROM categories WHERE category_id = %s', $id);
     }
 
     /**
@@ -68,7 +107,7 @@ class CategoryRepository extends BaseRepository
     /**
      * Delete category.
      *
-     * @param int $categoryId
+     * @param $payload
      * @return int
      * @throws MeekroDBException
      */
@@ -76,7 +115,7 @@ class CategoryRepository extends BaseRepository
     {
         $this->db->update('categories', [
             'deleted_by' => $payload['deleted_by'],
-            'deleted_at' => date('Y-m-d H:i:s'),
+            'deleted_at' => datetime(),
         ], 'category_id = %s', $payload['category_id']);
 
         return $this->db->affectedRows();

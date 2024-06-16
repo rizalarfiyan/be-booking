@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Constants;
 use App\Repository\CategoryRepository;
 use Booking\Constants as CoreConstants;
 use Booking\Exception\BadRequestException;
@@ -32,41 +31,76 @@ class CategoryService
         $this->category = new CategoryRepository($this->repo);
     }
 
-    public static function response($category): array
+    /**
+     * Mapping category response.
+     *
+     * @param $category
+     * @param bool $idDetail
+     * @return array
+     */
+    public static function response($category, bool $idDetail = false): array
     {
-        return [
+        $data = [
             'categoryId' => $category['category_id'],
             'name' => $category['name'],
             'slug' => $category['slug'],
+            'createdAt' => $category['created_at'],
+
         ];
+
+        if ($idDetail) {
+            $data['createdBy'] = $category['created_by'];
+            $data['updatedAt'] = $category['updated_at'];
+            $data['updatedBy'] = $category['updated_by'];
+            $data['deletedAt'] = $category['deleted_at'];
+            $data['deletedBy'] = $category['deleted_by'];
+        }
+
+        return $data;
     }
 
     /**
      * Get all categories.
      *
-     * @return mixed
+     * @param $payload
+     * @return array
+     * @throws UnprocessableEntitiesException
      */
-    public function getAll(): mixed
+    public function getAll($payload): array
     {
-        return $this->category->getAll();
+        try {
+            return [
+                'content' => collect($this->category->getAll($payload))->map(fn($contact) => self::response($contact)),
+                'total' => $this->category->countAll($payload),
+            ];
+        } catch (Throwable $t) {
+            errorLog($t);
+            throw new UnprocessableEntitiesException('Failed to get all contacts.');
+        }
     }
 
     /**
      * Get category by id.
      *
      * @param int $id
-     * @return mixed
+     * @return array
      * @throws NotFoundException
+     * @throws UnprocessableEntitiesException
      */
-    public function getById(int $id): mixed
+    public function getDetail(int $id): array
     {
-        $data = $this->category->getById($id);
-
-        if (! $data) {
-            throw new NotFoundException('Category not found');
+        try {
+            $data = $this->category->getById($id);
+        } catch (Throwable $t) {
+            errorLog($t);
+            throw new NotFoundException('Failed to get all category.');
         }
 
-        return self::response($data);
+        if (!$data) {
+            throw new UnprocessableEntitiesException('Category not found.');
+        }
+
+        return self::response($data, true);
     }
 
     /**
@@ -79,9 +113,8 @@ class CategoryService
      */
     public function insert($payload): void
     {
-
         try {
-           $this->category->insert($payload);
+            $this->category->insert($payload);
         } catch (Throwable $e) {
             errorLog($e);
 
@@ -91,7 +124,7 @@ class CategoryService
                 ]);
             }
 
-            throw new UnprocessableEntitiesException('Category could not be created, please contact Rizal.');
+            throw new UnprocessableEntitiesException('Category could not be created, please try again later.');
         }
     }
 
@@ -112,23 +145,29 @@ class CategoryService
 
             if ($e->getCode() === 1062) {
                 throw new BadRequestException(CoreConstants::VALIDATION_MESSAGE, [
-                    'category' => 'Category already exists.',
+                    'slug' => 'Slug already exists.',
                 ]);
             }
 
-            throw new UnprocessableEntitiesException('Category could not be updated, please contact Rizal.');
+            throw new UnprocessableEntitiesException('Category could not be updated, please try again later.');
         }
     }
 
     /**
      * Delete category.
      *
-     * @param int $id
+     * @param $payload
      * @return void
-     * @throws MeekroDBException
+     * @throws UnprocessableEntitiesException
      */
     public function delete($payload): void
     {
-        $this->category->delete($payload);
+        try {
+            $this->category->delete($payload);
+        } catch (Throwable $e) {
+            errorLog($e);
+
+            throw new UnprocessableEntitiesException('Category could not be deleted, please try again later.');
+        }
     }
 }

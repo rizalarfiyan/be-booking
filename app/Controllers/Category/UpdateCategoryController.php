@@ -15,7 +15,6 @@ use Respect\Validation\Validator as v;
 
 class UpdateCategoryController extends BaseCategoryController
 {
-
     /**
      * @throws UnprocessableEntitiesException
      * @throws UnauthorizedException

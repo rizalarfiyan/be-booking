@@ -10,7 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Respect\Validation\Validator as v;
 
-class PostChangePassword extends BaseAuthController
+class LoginAuthController extends BaseAuthController
 {
     /**
      * @param ServerRequestInterface $req
@@ -20,18 +20,14 @@ class PostChangePassword extends BaseAuthController
     public function __invoke(ServerRequestInterface $req): ResponseInterface
     {
         $data = $this->parseRequestDataToArray($req);
-        $code = $data['code'] ?? '';
 
-        if (strlen($code) !== 50) {
-            return $this->sendJson(null, StatusCode::STATUS_UNPROCESSABLE_ENTITY, 'Invalid change password code.');
-        }
-
-        $validation = v::key('password', v::stringType()->length(6, 36))
-            ->keyValue('passwordConfirmation', 'equals', 'password');
+        $validation = v::key('email', v::email()->noWhitespace())
+            ->key('password', v::stringType())
+            ->key('isRemember', v::boolVal());
 
         $validation->assert($data);
-        $this->auth->changePassword($data);
+        $data = $this->auth->login($data);
 
-        return $this->sendJson(null, StatusCode::STATUS_CREATED, 'Change password successfully.');
+        return $this->sendJson($data, StatusCode::STATUS_OK, 'User login successfully.');
     }
 }

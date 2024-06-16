@@ -1,5 +1,4 @@
 -- Migrate to Version 3
-
 CREATE TABLE categories (
     category_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
@@ -11,4 +10,3 @@ CREATE TABLE categories (
     deleted_at DATETIME,
     deleted_by INT
 );
-

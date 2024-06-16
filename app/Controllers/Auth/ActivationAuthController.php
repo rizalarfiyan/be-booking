@@ -8,9 +8,8 @@ use Booking\Message\StatusCodeInterface as StatusCode;
 use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Respect\Validation\Validator as v;
 
-class PostLogin extends BaseAuthController
+class ActivationAuthController extends BaseAuthController
 {
     /**
      * @param ServerRequestInterface $req
@@ -20,14 +19,14 @@ class PostLogin extends BaseAuthController
     public function __invoke(ServerRequestInterface $req): ResponseInterface
     {
         $data = $this->parseRequestDataToArray($req);
+        $code = $data['code'] ?? '';
 
-        $validation = v::key('email', v::email()->noWhitespace())
-            ->key('password', v::stringType())
-            ->key('isRemember', v::boolVal());
+        if (strlen($code) !== 50) {
+            return $this->sendJson(null, StatusCode::STATUS_UNPROCESSABLE_ENTITY, 'Invalid activation code.');
+        }
 
-        $validation->assert($data);
-        $data = $this->auth->login($data);
+        $this->auth->activation($code);
 
-        return $this->sendJson($data, StatusCode::STATUS_OK, 'User login successfully.');
+        return $this->sendJson(null, StatusCode::STATUS_CREATED, 'Successfully activation.');
     }
 }

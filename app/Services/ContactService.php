@@ -72,10 +72,10 @@ class ContactService
      * Get all contacts.
      *
      * @param $payload
-     * @return mixed
+     * @return array
      * @throws UnprocessableEntitiesException
      */
-    public function getAll($payload): mixed
+    public function getAll($payload): array
     {
         try {
             return [
@@ -99,16 +99,16 @@ class ContactService
     public function getDetail(int $id): array
     {
         try {
-            $contact = $this->user->getById($id);
+            $data = $this->user->getById($id);
         } catch (Throwable $t) {
             errorLog($t);
             throw new NotFoundException('Failed to get all contacts.');
         }
 
-        if (! $contact) {
+        if (! $data) {
             throw new UnprocessableEntitiesException('Contact not found.');
         }
 
-        return self::response($contact, true);
+        return self::response($data, true);
     }
 }

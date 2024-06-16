@@ -6,17 +6,19 @@ namespace App\Controllers\Category;
 
 use App\Services\AuthService;
 use Booking\Exception\BadRequestException;
+use Booking\Exception\UnauthorizedException;
 use Booking\Exception\UnprocessableEntitiesException;
 use Booking\Message\StatusCodeInterface as StatusCode;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Respect\Validation\Validator as v;
 
-class PostNewCategoryController extends BaseCategoryController
+class CreateCategoryController extends BaseCategoryController
 {
     /**
      * @throws UnprocessableEntitiesException
      * @throws BadRequestException
+     * @throws UnauthorizedException
      */
     public function __invoke(ServerRequestInterface $req): ResponseInterface
     {

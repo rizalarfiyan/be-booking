@@ -10,7 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Respect\Validation\Validator as v;
 
-class PostNewContact extends BaseContactController
+class CreateContactController extends BaseContactController
 {
     /**
      * @param ServerRequestInterface $req
