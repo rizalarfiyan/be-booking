@@ -22,35 +22,48 @@ abstract class AbstractController implements ControllerInterface
     }
 
     /**
-     * Get the current in query string
+     * Get the datatable schema in query string
      * or return a default value.
      *
      * @param ServerRequestInterface $request
-     * @return int
+     * @return array
      */
-    public function getCurrentPage(ServerRequestInterface $request): int
+    public function getDatatable(ServerRequestInterface $request): array
     {
-        $queryParams = $request->getQueryParams();
+        $query = $request->getQueryParams();
+        $count = isset($query['count']) ? is_numeric($query['count']) ? (int) $query['count'] : null : null;
+        $page = isset($query['page']) ? is_numeric($query['page']) ? (int) $query['page'] : 0 : 0;
 
-        return isset($queryParams['page'])
-            ? (int) $queryParams['page']
-            : 1;
+        return [
+            'page' => $page > 0 ? $page - 1 : 0,
+            'count' => ! empty($count) ? $count : (int) config('app.count'),
+            'orderBy' => $query['orderBy'] ?? null,
+            'orderType' => $query['orderType'] ?? null,
+        ];
     }
 
     /**
-     * Get the page size in query string
-     * or return a default value.
+     * Array response for list data.
      *
-     * @param ServerRequestInterface $request
-     * @return int
+     * @param array $content
+     * @param array $metadata
+     * @param int $total
+     * @return array
      */
-    public function getPageSize(ServerRequestInterface $request): int
+    public function listResponse(array $content, array $metadata, int $total = 0): array
     {
-        $queryParams = $request->getQueryParams();
+        $total = $content['total'];
+        infoLog(json_encode([$metadata['count'], $total]));
 
-        return isset($queryParams['per_page'])
-            ? (int) $queryParams['per_page']
-            : (int) config('app.page_size');
+        return [
+            'content' => $content['content'],
+            'metadata' => [
+                'total' => $total,
+                'page' => $metadata['page'] + 1,
+                'perPage' => $metadata['count'],
+                'totalPage' => ceil($total / $metadata['count']),
+            ],
+        ];
     }
 
     /**
