@@ -22,11 +22,13 @@ class DeleteCategoryController extends BaseCategoryController
      */
     public function __invoke(int $id, ServerRequestInterface $req): ResponseInterface
     {
-        $user_id = AuthService::getUserIdFromToken($req);
+        $userId = AuthService::getUserIdFromToken($req);
+        $data = $this->parseRequestDataToArray($req);
 
         $data['category_id'] = $id;
-        $data['deleted_by'] = $user_id;
-        $this->category->delete($data);
+        $data['deleted_by'] = $userId;
+        $data['updated_by'] = $userId;
+        $this->category->delete($data, $data['isRestore'] ?? false);
 
         return $this->sendJson(null, StatusCode::STATUS_OK, 'Category deleted successfully.');
     }

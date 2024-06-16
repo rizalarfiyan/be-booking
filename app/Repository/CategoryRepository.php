@@ -114,8 +114,27 @@ class CategoryRepository extends BaseRepository
     public function delete($payload): int
     {
         $this->db->update('categories', [
+            'updated_by' => $payload['updated_by'],
             'deleted_by' => $payload['deleted_by'],
             'deleted_at' => datetime(),
+        ], 'category_id = %s', $payload['category_id']);
+
+        return $this->db->affectedRows();
+    }
+
+    /**
+     * Delete category.
+     *
+     * @param $payload
+     * @return int
+     * @throws MeekroDBException
+     */
+    public function restoreDelete($payload): int
+    {
+        $this->db->update('categories', [
+            'updated_by' => $payload['updated_by'],
+            'deleted_by' => null,
+            'deleted_at' => null,
         ], 'category_id = %s', $payload['category_id']);
 
         return $this->db->affectedRows();

@@ -41,18 +41,17 @@ class CategoryService
     public static function response($category, bool $idDetail = false): array
     {
         $data = [
-            'categoryId' => $category['category_id'],
+            'categoryId' => (int) $category['category_id'],
             'name' => $category['name'],
             'slug' => $category['slug'],
             'createdAt' => $category['created_at'],
-
+            'deletedAt' => $category['deleted_at'],
         ];
 
         if ($idDetail) {
             $data['createdBy'] = $category['created_by'];
             $data['updatedAt'] = $category['updated_at'];
             $data['updatedBy'] = $category['updated_by'];
-            $data['deletedAt'] = $category['deleted_at'];
             $data['deletedBy'] = $category['deleted_by'];
         }
 
@@ -70,7 +69,7 @@ class CategoryService
     {
         try {
             return [
-                'content' => collect($this->category->getAll($payload))->map(fn($contact) => self::response($contact)),
+                'content' => collect($this->category->getAll($payload))->map(fn ($contact) => self::response($contact)),
                 'total' => $this->category->countAll($payload),
             ];
         } catch (Throwable $t) {
@@ -96,7 +95,7 @@ class CategoryService
             throw new NotFoundException('Failed to get all category.');
         }
 
-        if (!$data) {
+        if (! $data) {
             throw new UnprocessableEntitiesException('Category not found.');
         }
 
@@ -157,17 +156,23 @@ class CategoryService
      * Delete category.
      *
      * @param $payload
+     * @param bool $isRestore
      * @return void
      * @throws UnprocessableEntitiesException
      */
-    public function delete($payload): void
+    public function delete($payload, bool $isRestore = false): void
     {
         try {
-            $this->category->delete($payload);
+            if ($isRestore) {
+                $this->category->restoreDelete($payload);
+            } else {
+                $this->category->delete($payload);
+            }
         } catch (Throwable $e) {
             errorLog($e);
 
-            throw new UnprocessableEntitiesException('Category could not be deleted, please try again later.');
+            $state = $isRestore ? 'restored' : 'deleted';
+            throw new UnprocessableEntitiesException("Category could not be $state, please try again later.");
         }
     }
 }
