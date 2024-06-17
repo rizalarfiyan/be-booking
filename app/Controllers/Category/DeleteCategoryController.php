@@ -25,11 +25,13 @@ class DeleteCategoryController extends BaseCategoryController
         $userId = AuthService::getUserIdFromToken($req);
         $data = $this->parseRequestDataToArray($req);
 
+        $isRestore = $data['isRestore'] ?? false;
         $data['category_id'] = $id;
         $data['deleted_by'] = $userId;
         $data['updated_by'] = $userId;
-        $this->category->delete($data, $data['isRestore'] ?? false);
+        $this->category->delete($data, $isRestore);
 
-        return $this->sendJson(null, StatusCode::STATUS_OK, 'Category deleted successfully.');
+        $state = $isRestore ? 'restored' : 'deleted';
+        return $this->sendJson(null, StatusCode::STATUS_OK, "Category $state successfully.");
     }
 }

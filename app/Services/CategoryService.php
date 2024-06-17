@@ -49,10 +49,10 @@ class CategoryService
         ];
 
         if ($idDetail) {
-            $data['createdBy'] = $category['created_by'];
+            $data['createdBy'] = (int) $category['created_by'];
             $data['updatedAt'] = $category['updated_at'];
-            $data['updatedBy'] = $category['updated_by'];
-            $data['deletedBy'] = $category['deleted_by'];
+            $data['updatedBy'] = (int) $category['updated_by'];
+            $data['deletedBy'] = (int) $category['deleted_by'];
         }
 
         return $data;
