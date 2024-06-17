@@ -8,8 +8,9 @@ use Booking\Message\StatusCodeInterface as StatusCode;
 use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Respect\Validation\Validator as v;
 
-class GetMe extends BaseAuthController
+class ForgotPasswordAuthController extends BaseAuthController
 {
     /**
      * @param ServerRequestInterface $req
@@ -18,9 +19,13 @@ class GetMe extends BaseAuthController
      */
     public function __invoke(ServerRequestInterface $req): ResponseInterface
     {
-        $id = $this->auth->getUserIdFromToken($req);
-        $data = $this->auth->me($id);
+        $data = $this->parseRequestDataToArray($req);
 
-        return $this->sendJson($data, StatusCode::STATUS_OK, 'Get user me successfully.');
+        $validation = v::key('email', v::email()->noWhitespace());
+
+        $validation->assert($data);
+        $this->auth->forgotPassword($data['email']);
+
+        return $this->sendJson(null, StatusCode::STATUS_OK, 'Forgot password send successfully.');
     }
 }

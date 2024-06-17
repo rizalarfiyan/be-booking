@@ -10,7 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Respect\Validation\Validator as v;
 
-class PostForgotPassword extends BaseAuthController
+class RegisterAuthController extends BaseAuthController
 {
     /**
      * @param ServerRequestInterface $req
@@ -21,11 +21,15 @@ class PostForgotPassword extends BaseAuthController
     {
         $data = $this->parseRequestDataToArray($req);
 
-        $validation = v::key('email', v::email()->noWhitespace());
+        $validation = v::key('email', v::email()->noWhitespace())
+            ->key('firstName', v::alpha()->length(3, 50))
+            ->key('lastName', v::optional(v::alpha()->length(3, 50)))
+            ->key('password', v::stringType()->length(6, 36))
+            ->keyValue('passwordConfirmation', 'equals', 'password');
 
         $validation->assert($data);
-        $this->auth->forgotPassword($data['email']);
+        $this->auth->register($data);
 
-        return $this->sendJson(null, StatusCode::STATUS_OK, 'Forgot password send successfully.');
+        return $this->sendJson(null, StatusCode::STATUS_CREATED, 'User registered successfully.');
     }
 }

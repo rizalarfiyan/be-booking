@@ -9,7 +9,7 @@ use Booking\Exception\UnprocessableEntitiesException;
 use Booking\Message\StatusCodeInterface as StatusCode;
 use Psr\Http\Message\ResponseInterface;
 
-class GetDetail extends BaseContactController
+class DetailContactController extends BaseContactController
 {
     /**
      * @param int $id

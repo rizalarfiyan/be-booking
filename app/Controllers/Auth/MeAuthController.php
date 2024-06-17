@@ -9,7 +9,7 @@ use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class PostActivation extends BaseAuthController
+class MeAuthController extends BaseAuthController
 {
     /**
      * @param ServerRequestInterface $req
@@ -18,15 +18,9 @@ class PostActivation extends BaseAuthController
      */
     public function __invoke(ServerRequestInterface $req): ResponseInterface
     {
-        $data = $this->parseRequestDataToArray($req);
-        $code = $data['code'] ?? '';
+        $id = $this->auth->getUserIdFromToken($req);
+        $data = $this->auth->me($id);
 
-        if (strlen($code) !== 50) {
-            return $this->sendJson(null, StatusCode::STATUS_UNPROCESSABLE_ENTITY, 'Invalid activation code.');
-        }
-
-        $this->auth->activation($code);
-
-        return $this->sendJson(null, StatusCode::STATUS_CREATED, 'Successfully activation.');
+        return $this->sendJson($data, StatusCode::STATUS_OK, 'Get user me successfully.');
     }
 }
