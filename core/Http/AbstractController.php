@@ -54,7 +54,6 @@ abstract class AbstractController implements ControllerInterface
     public function listResponse(array $content, array $metadata, int $total = 0): array
     {
         $total = $content['total'];
-        infoLog(json_encode([$metadata['count'], $total]));
 
         return [
             'content' => $content['content'],

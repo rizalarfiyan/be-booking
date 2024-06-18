@@ -13,4 +13,8 @@ interface Constants
     public const TYPE_USER_ACTIVE = 'active';
 
     public const TYPE_USER_INACTIVE = 'inactive';
+
+    public const ROLE_ADMIN = 'admin';
+
+    public const ROLE_READER = 'reader';
 }
