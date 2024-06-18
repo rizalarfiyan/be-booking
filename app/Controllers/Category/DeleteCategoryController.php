@@ -32,6 +32,7 @@ class DeleteCategoryController extends BaseCategoryController
         $this->category->delete($data, $isRestore);
 
         $state = $isRestore ? 'restored' : 'deleted';
+
         return $this->sendJson(null, StatusCode::STATUS_OK, "Category $state successfully.");
     }
 }

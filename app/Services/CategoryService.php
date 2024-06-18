@@ -41,7 +41,7 @@ class CategoryService
     public static function response($category, bool $idDetail = false): array
     {
         $data = [
-            'categoryId' => (int)$category['category_id'],
+            'categoryId' => (int) $category['category_id'],
             'name' => $category['name'],
             'slug' => $category['slug'],
             'createdAt' => $category['created_at'],
@@ -49,10 +49,10 @@ class CategoryService
         ];
 
         if ($idDetail) {
-            $data['createdBy'] = (int)$category['created_by'];
+            $data['createdBy'] = (int) $category['created_by'];
             $data['updatedAt'] = $category['updated_at'];
-            $data['updatedBy'] = (int)$category['updated_by'];
-            $data['deletedBy'] = (int)$category['deleted_by'];
+            $data['updatedBy'] = (int) $category['updated_by'];
+            $data['deletedBy'] = (int) $category['deleted_by'];
         }
 
         return $data;
@@ -62,10 +62,10 @@ class CategoryService
      * @param $category
      * @return array
      */
-    public static function dropdownResponse($category)
+    public static function dropdownResponse($category): array
     {
         return [
-            'value' => (int)$category['category_id'],
+            'value' => (int) $category['category_id'],
             'label' => $category['name'],
         ];
     }
@@ -81,7 +81,7 @@ class CategoryService
     {
         try {
             return [
-                'content' => collect($this->category->getAll($payload))->map(fn($contact) => self::response($contact)),
+                'content' => collect($this->category->getAll($payload))->map(fn ($contact) => self::response($contact)),
                 'total' => $this->category->countAll($payload),
             ];
         } catch (Throwable $t) {
@@ -100,7 +100,7 @@ class CategoryService
     public function getAllDropdown($payload): array
     {
         try {
-            return collect($this->category->getAllDropdown($payload))->map(fn($contact) => self::dropdownResponse($contact))->toArray();
+            return collect($this->category->getAllDropdown($payload))->map(fn ($contact) => self::dropdownResponse($contact))->toArray();
         } catch (Throwable $t) {
             errorLog($t);
             throw new UnprocessableEntitiesException('Failed to get all categories.');
@@ -124,7 +124,7 @@ class CategoryService
             throw new NotFoundException('Failed to get all category.');
         }
 
-        if (!$data) {
+        if (! $data) {
             throw new UnprocessableEntitiesException('Category not found.');
         }
 
