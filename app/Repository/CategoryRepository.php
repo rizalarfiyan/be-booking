@@ -16,7 +16,7 @@ class CategoryRepository extends BaseRepository
      */
     protected function baseGetAll($payload): WhereClause
     {
-        $where = new WhereClause('or');
+        $where = new WhereClause('and');
         if (! empty($payload['search'])) {
             $where->add('name like %s', "%{$payload['search']}%");
         }
@@ -45,6 +45,20 @@ class CategoryRepository extends BaseRepository
         $orderType = columnValidation(['ASC', 'DESC'], $payload['orderType']) ?? 'ASC';
 
         return $this->db->query('SELECT * FROM categories WHERE %l ORDER BY %l %l LIMIT %d OFFSET %d', $condition, $orderBy, $orderType, $payload['count'], $payload['page'] * $payload['count']);
+    }
+
+    /**
+     * @param $payload
+     * @return mixed
+     */
+    public function getAllDropdown($payload): mixed
+    {
+        $where = new WhereClause('and');
+        if (! empty($payload['search'])) {
+            $where->add('name like %s', "%{$payload['search']}%");
+        }
+
+        return $this->db->query('SELECT category_id, name FROM categories WHERE %l ORDER BY name ASC LIMIT %d OFFSET %d', $where, $payload['count'], $payload['page'] * $payload['count']);
     }
 
     /**

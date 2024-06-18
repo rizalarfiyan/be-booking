@@ -25,6 +25,7 @@ $router->group('/api/v1/', function ($router) {
     });
 
     $router->group('/category', function ($router) use ($auth) {
+        $router->get('/dropdown', App\Controllers\Category\AllDropdownCategoryController::class, [$auth]);
         $router->get('/', App\Controllers\Category\AllCategoryController::class, [$auth]);
         $router->post('/', App\Controllers\Category\CreateCategoryController::class, [$auth]);
         $router->get('/{id}', App\Controllers\Category\DetailCategoryController::class, [$auth]);

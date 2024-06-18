@@ -39,6 +39,7 @@ abstract class AbstractController implements ControllerInterface
             'count' => ! empty($count) ? $count : (int) config('app.count'),
             'orderBy' => $query['orderBy'] ?? null,
             'orderType' => $query['orderType'] ?? null,
+            'search' => $query['search'] ?? null,
         ];
     }
 

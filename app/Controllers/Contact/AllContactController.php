@@ -19,12 +19,8 @@ class AllContactController extends BaseContactController
      */
     public function __invoke(ServerRequestInterface $req): ResponseInterface
     {
-        $query = $req->getQueryParams();
         $metadata = $this->getDatatable($req);
-        $contacts = $this->contact->getAll([
-            ...$metadata,
-            'search' => $query['search'] ?? null,
-        ]);
+        $contacts = $this->contact->getAll($metadata);
 
         return $this->sendJson($this->listResponse($contacts, $metadata), StatusCode::STATUS_OK, 'Get all contact successfully.');
     }
