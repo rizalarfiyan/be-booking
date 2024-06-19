@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use Booking\Repository\BaseRepository;
+use MeekroDBException;
 
 class BookRepository extends BaseRepository
 {
@@ -53,5 +54,42 @@ class BookRepository extends BaseRepository
         })->toArray();
 
         $this->db->insert('book_categories', $bookCategories);
+    }
+
+
+    /**
+     * Delete books.
+     *
+     * @param $payload
+     * @return int
+     * @throws MeekroDBException
+     */
+    public function delete($payload): int
+    {
+        $this->db->update('books', [
+            'updated_by' => $payload['updated_by'],
+            'deleted_by' => $payload['deleted_by'],
+            'deleted_at' => datetime(),
+        ], 'book_id = %s', $payload['book_id']);
+
+        return $this->db->affectedRows();
+    }
+
+    /**
+     * Delete books.
+     *
+     * @param $payload
+     * @return int
+     * @throws MeekroDBException
+     */
+    public function restoreDelete($payload): int
+    {
+        $this->db->update('books', [
+            'updated_by' => $payload['updated_by'],
+            'deleted_by' => null,
+            'deleted_at' => null,
+        ], 'book_id = %s', $payload['book_id']);
+
+        return $this->db->affectedRows();
     }
 }

@@ -10,7 +10,7 @@ use Booking\Exception\BadRequestException;
 use Booking\Exception\UnprocessableEntitiesException;
 use Booking\Repository\BaseRepository;
 use MeekroDB;
-use Exception;
+use Throwable;
 
 class BookService
 {
@@ -42,15 +42,15 @@ class BookService
             $bookId = $this->book->insert($payload);
             $this->book->insertCategories($bookId, $payload['categoryId']);
             $this->repo->commit();
-        } catch (Exception $e) {
+        } catch (Throwable $t) {
             $this->repo->rollback();
             removeFile($payload['image']);
-            errorLog($e);
+            errorLog($t);
 
-            infoLog($e->getCode()."");
+            infoLog($t->getCode() . "");
 
-            if ($e->getCode() === 1062) {
-                $message = $e->getMessage();
+            if ($t->getCode() === 1062) {
+                $message = $t->getMessage();
                 $error = [];
                 if (str_contains($message, 'books.isbn')) {
                     $error = [
@@ -71,13 +71,37 @@ class BookService
                 throw new BadRequestException(CoreConstants::VALIDATION_MESSAGE, $error);
             }
 
-            if ($e->getCode() === 1452) {
+            if ($t->getCode() === 1452) {
                 throw new BadRequestException(CoreConstants::VALIDATION_MESSAGE, [
                     'categoryId' => 'Invalid category id.',
                 ]);
             }
 
             throw new UnprocessableEntitiesException('Book could not be created, please contact administrator.');
+        }
+    }
+
+    /**
+     * Delete book.
+     *
+     * @param $payload
+     * @param bool $isRestore
+     * @return void
+     * @throws UnprocessableEntitiesException
+     */
+    public function delete($payload, bool $isRestore = false): void
+    {
+        try {
+            if ($isRestore) {
+                $this->book->restoreDelete($payload);
+            } else {
+                $this->book->delete($payload);
+            }
+        } catch (Throwable $e) {
+            errorLog($e);
+
+            $state = $isRestore ? 'restored' : 'deleted';
+            throw new UnprocessableEntitiesException("Book could not be $state, please try again later.");
         }
     }
 }

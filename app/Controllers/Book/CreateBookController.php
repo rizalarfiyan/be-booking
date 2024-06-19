@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Controllers\Book;
 
 use App\Services\AuthService;
+use Booking\Exception\BadRequestException;
 use Booking\Exception\UnauthorizedException;
+use Booking\Exception\UnprocessableEntitiesException;
 use Booking\Message\StatusCodeInterface as StatusCode;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -14,7 +16,11 @@ use Respect\Validation\Validator as v;
 class CreateBookController extends BaseBookController
 {
     /**
+     * @param ServerRequestInterface $req
+     * @return ResponseInterface
      * @throws UnauthorizedException
+     * @throws BadRequestException
+     * @throws UnprocessableEntitiesException
      */
     public function __invoke(ServerRequestInterface $req): ResponseInterface
     {

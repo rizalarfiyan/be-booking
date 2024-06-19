@@ -36,5 +36,6 @@ $router->group('/api/v1/', function ($router) {
 
     $router->group('/book', function ($router) use ($auth, $admin) {
         $router->post('/', App\Controllers\Book\CreateBookController::class, [$auth, $admin]);
+        $router->delete('/{id}', App\Controllers\Book\DeleteBookController::class, [$auth, $admin]);
     });
 });
