@@ -88,7 +88,7 @@ class CategoryRepository extends BaseRepository
      */
     public function getById(int $id): mixed
     {
-        return $this->db->queryFirstRow('SELECT * FROM categories WHERE category_id = %s', $id);
+        return $this->db->queryFirstRow('SELECT * FROM categories WHERE category_id = %d', $id);
     }
 
     /**
@@ -121,7 +121,7 @@ class CategoryRepository extends BaseRepository
             'name' => $payload['name'],
             'slug' => $payload['slug'],
             'updated_by' => $payload['updated_by'],
-        ], 'category_id = %s', $payload['category_id']);
+        ], 'category_id = %d', $payload['category_id']);
 
         return $this->db->affectedRows();
     }
@@ -139,7 +139,7 @@ class CategoryRepository extends BaseRepository
             'updated_by' => $payload['updated_by'],
             'deleted_by' => $payload['deleted_by'],
             'deleted_at' => datetime(),
-        ], 'category_id = %s', $payload['category_id']);
+        ], 'category_id = %d', $payload['category_id']);
 
         return $this->db->affectedRows();
     }
@@ -157,7 +157,7 @@ class CategoryRepository extends BaseRepository
             'updated_by' => $payload['updated_by'],
             'deleted_by' => null,
             'deleted_at' => null,
-        ], 'category_id = %s', $payload['category_id']);
+        ], 'category_id = %d', $payload['category_id']);
 
         return $this->db->affectedRows();
     }

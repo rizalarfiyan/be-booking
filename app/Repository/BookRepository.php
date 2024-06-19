@@ -68,7 +68,7 @@ class BookRepository extends BaseRepository
             'updated_by' => $payload['updated_by'],
             'deleted_by' => $payload['deleted_by'],
             'deleted_at' => datetime(),
-        ], 'book_id = %s', $payload['book_id']);
+        ], 'book_id = %d', $payload['book_id']);
 
         return $this->db->affectedRows();
     }
@@ -86,7 +86,7 @@ class BookRepository extends BaseRepository
             'updated_by' => $payload['updated_by'],
             'deleted_by' => null,
             'deleted_at' => null,
-        ], 'book_id = %s', $payload['book_id']);
+        ], 'book_id = %d', $payload['book_id']);
 
         return $this->db->affectedRows();
     }
@@ -100,7 +100,7 @@ class BookRepository extends BaseRepository
     public function getById(int $id): mixed
     {
         // TODO: update the query
-        return $this->db->queryFirstRow('SELECT * FROM books WHERE book_id = %s', $id);
+        return $this->db->queryFirstRow('SELECT * FROM books WHERE book_id = %d', $id);
     }
 
 
@@ -112,7 +112,7 @@ class BookRepository extends BaseRepository
      */
     public function getStock(int $id): mixed
     {
-        return $this->db->queryFirstRow('SELECT stock, borrow FROM books WHERE book_id = %s', $id);
+        return $this->db->queryFirstRow('SELECT stock, borrowed FROM books WHERE book_id = %d', $id);
     }
 
     /**
@@ -124,7 +124,7 @@ class BookRepository extends BaseRepository
     public function getCategoryByBookId(int $id): mixed
     {
         $query = 'WITH bcs AS (
-            SELECT category_id from book_categories where book_id = %s
+            SELECT category_id from book_categories where book_id = %d
         )
         SELECT c.category_id, c.name, c.slug FROM bcs
         JOIN categories c USING (category_id)
@@ -134,13 +134,34 @@ class BookRepository extends BaseRepository
     }
 
     /**
+     * Get book category by book id.
+     *
+     * @param int $id
+     * @param int $limit
+     * @return mixed
+     */
+    public function getRecommendationByBookId(int $id, int $limit): mixed
+    {
+        $query = 'SELECT b.book_id, b.slug, b.title, getBookRating(b.rating, b.rating_count) AS rating, b.image, b.author
+    FROM book_categories bc JOIN books b USING (book_id)
+    WHERE b.deleted_at IS NULL
+      AND b.book_id != %d
+      AND bc.category_id IN (SELECT category_id FROM book_categories WHERE book_id = %d)
+    GROUP BY b.book_id
+    ORDER BY b.borrowed_count DESC, rating DESC
+    LIMIT %d';
+
+        return $this->db->query($query, $id, $id, $limit);
+    }
+
+    /**
      * Get book published year.
      *
      * @return mixed
      */
     public function getPublishedYear(): mixed
     {
-        return $this->db->query('SELECT DISTINCT YEAR(published_at) as year FROM books WHERE deleted_at IS NULL ORDER BY year DESC');
+        return $this->db->query('SELECT DISTINCT YEAR(published_at) AS YEAR FROM books WHERE deleted_at IS NULL ORDER BY YEAR DESC');
     }
 
     /**

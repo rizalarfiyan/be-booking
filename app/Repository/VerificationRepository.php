@@ -48,6 +48,6 @@ class VerificationRepository extends BaseRepository
      */
     public function deleteByTypeAndUser(string $type, int $userId): mixed
     {
-        return $this->db->delete('verifications', 'type = %s and user_id = %i', $type, $userId);
+        return $this->db->delete('verifications', 'type = %s and user_id = %d', $type, $userId);
     }
 }

@@ -84,6 +84,6 @@ class ContactRepository extends BaseRepository
      */
     public function getById(int $id): mixed
     {
-        return $this->db->queryFirstRow('SELECT * FROM contacts where contact_id = %s', $id);
+        return $this->db->queryFirstRow('SELECT * FROM contacts where contact_id = %d', $id);
     }
 }

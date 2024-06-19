@@ -27,7 +27,7 @@ class UserRepository extends BaseRepository
      */
     public function getById(int $id): mixed
     {
-        return $this->db->queryFirstRow('SELECT * FROM users where user_id = %s', $id);
+        return $this->db->queryFirstRow('SELECT * FROM users where user_id = %d', $id);
     }
 
     /**
@@ -71,7 +71,7 @@ class UserRepository extends BaseRepository
     {
         return $this->db->update('users', [
             'status' => $status,
-        ], 'user_id=%s', $userId);
+        ], 'user_id=%d', $userId);
     }
 
     /**
@@ -84,6 +84,6 @@ class UserRepository extends BaseRepository
     {
         return $this->db->update('users', [
             'password' => $password,
-        ], 'user_id=%s', $userId);
+        ], 'user_id=%d', $userId);
     }
 }

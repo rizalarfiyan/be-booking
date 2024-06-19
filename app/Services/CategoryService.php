@@ -35,10 +35,10 @@ class CategoryService
      * Mapping category response.
      *
      * @param $category
-     * @param bool $idDetail
+     * @param bool $isDetail
      * @return array
      */
-    public static function response($category, bool $idDetail = false): array
+    public static function response($category, bool $isDetail = false): array
     {
         $data = [
             'categoryId' => (int) $category['category_id'],
@@ -48,7 +48,7 @@ class CategoryService
             'deletedAt' => $category['deleted_at'],
         ];
 
-        if ($idDetail) {
+        if ($isDetail) {
             $data['createdBy'] = (int) $category['created_by'];
             $data['updatedAt'] = $category['updated_at'];
             $data['updatedBy'] = (int) $category['updated_by'];

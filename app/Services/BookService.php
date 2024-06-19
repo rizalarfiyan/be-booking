@@ -39,27 +39,33 @@ class BookService
      * Mapping category response.
      *
      * @param $book
-     * @param bool $idDetail
+     * @param string $type
      * @return array
      */
-    public static function response($book, bool $idDetail = false): array
+    public static function response($book, string $type = 'all'): array
     {
         $data = [
             'bookId' => (int)$book['book_id'],
             'title' => $book['title'],
             'slug' => $book['slug'],
             'image' => config('app.url') . $book['image'],
-            'language' => $book['language'],
             'rating' => (float)$book['rating'],
-            'publishedAt' => $book['published_at'],
-            'createdAt' => $book['created_at'],
-            'deletedAt' => $book['deleted_at'],
         ];
 
-        if ($idDetail) {
+        if (in_array($type, ['all', 'detail'])) {
+            $data['language'] = $book['language'];
+            $data['publishedAt'] = $book['published_at'];
+            $data['createdAt'] = $book['created_at'];
+            $data['deletedAt'] = $book['deleted_at'];
+        }
+
+        if (in_array($type, ['detail', 'card'])) {
+            $data['author'] = json_decode($book['author']);
+        }
+
+        if ($type === 'detail') {
             $data['isbn'] = $book['isbn'];
             $data['sku'] = $book['sku'];
-            $data['author'] = json_decode($book['author']);
             $data['pages'] = (int)$book['pages'];
             $data['weight'] = (float)$book['weight'];
             $data['width'] = (int)$book['width'];
@@ -71,7 +77,7 @@ class BookService
             $data['deletedBy'] = (int)$book['deleted_by'];
         }
 
-        if ($book['category']) {
+        if (isset($book['category'])) {
             $data['category'] = collect($book['category'])->map(function ($category) {
                 return [
                     'categoryId' => (int)$category['category_id'],
@@ -112,9 +118,28 @@ class BookService
             errorLog($t);
         }
 
-        return self::response($data, true);
+        return self::response($data, 'detail');
     }
 
+
+    /**
+     * Get category by id.
+     *
+     * @param int $id
+     * @return array
+     * @throws UnprocessableEntitiesException
+     */
+    public function getRecommendation(int $id): array
+    {
+        try {
+            $data = $this->book->getRecommendationByBookId($id, 6);
+        } catch (Throwable $t) {
+            errorLog($t);
+            throw new UnprocessableEntitiesException('Failed to get book recommendation.');
+        }
+
+        return collect($data)->map(fn($book) => self::response($book, 'card'))->toArray();
+    }
 
     /**
      * Get category by id.
