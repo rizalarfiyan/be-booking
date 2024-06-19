@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Repository\BookRepository;
 use Booking\Constants as CoreConstants;
 use Booking\Exception\BadRequestException;
+use Booking\Exception\NotFoundException;
 use Booking\Exception\UnprocessableEntitiesException;
 use Booking\Repository\BaseRepository;
 use MeekroDB;
@@ -30,6 +31,87 @@ class BookService
     }
 
     /**
+     * Mapping category response.
+     *
+     * @param $book
+     * @param bool $idDetail
+     * @return array
+     */
+    public static function response($book, bool $idDetail = false): array
+    {
+        // TODO: update this method to return the correct data
+        $data = [
+            'bookId' => (int) $book['book_id'],
+            'title' => $book['title'],
+            'slug' => $book['slug'],
+            'image' => config('app.url').$book['image'],
+            'language' => $book['language'],
+            'rating' => (float) $book['rating'],
+            'publishedAt' => $book['published_at'],
+            'createdAt' => $book['created_at'],
+            'deletedAt' => $book['deleted_at'],
+        ];
+
+        if ($idDetail) {
+            $data['isbn'] = $book['isbn'];
+            $data['sku'] = $book['sku'];
+            $data['author'] = json_decode($book['author']);
+            $data['pages'] = (int) $book['pages'];
+            $data['weight'] = (float) $book['weight'];
+            $data['width'] = (int) $book['width'];
+            $data['height'] = (int) $book['height'];
+            $data['description'] = $book['description'];
+            $data['createdBy'] = (int) $book['created_by'];
+            $data['updatedAt'] = $book['updated_at'];
+            $data['updatedBy'] = (int) $book['updated_by'];
+            $data['deletedBy'] = (int) $book['deleted_by'];
+        }
+
+        if ($book['category']) {
+            $data['category'] = collect($book['category'])->map(function ($category) {
+                return [
+                    'categoryId' => (int) $category['category_id'],
+                    'name' => $category['name'],
+                    'slug' => $category['slug'],
+                ];
+            })->toArray();
+        }
+
+        return $data;
+    }
+
+    /**
+     * Get category by id.
+     *
+     * @param int $id
+     * @return array
+     * @throws NotFoundException
+     * @throws UnprocessableEntitiesException
+     */
+    public function getDetail(int $id): array
+    {
+        try {
+            $data = $this->book->getById($id);
+        } catch (Throwable $t) {
+            errorLog($t);
+            throw new NotFoundException('Failed to get all book.');
+        }
+
+        if (! $data) {
+            throw new UnprocessableEntitiesException('Book not found.');
+        }
+
+        try {
+            $category = $this->book->getCategoryByBookId($id);
+            $data['category'] = $category;
+        } catch (Throwable $t) {
+            errorLog($t);
+        }
+
+        return self::response($data, true);
+    }
+
+    /**
      * @param $payload
      * @return void
      * @throws BadRequestException
@@ -47,7 +129,7 @@ class BookService
             removeFile($payload['image']);
             errorLog($t);
 
-            infoLog($t->getCode() . "");
+            infoLog($t->getCode().'');
 
             if ($t->getCode() === 1062) {
                 $message = $t->getMessage();

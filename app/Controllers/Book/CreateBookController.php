@@ -50,12 +50,13 @@ class CreateBookController extends BaseBookController
         $file->moveTo($filename);
 
         $data['image'] = $filename;
-        $data['author'] = collect($data['author'])->map(fn($author) => trim($author))->unique()->toArray();
-        $data['categoryId'] = collect($data['categoryId'])->map(fn($author) => (int)trim($author))->unique()->toArray();
+        $data['author'] = collect($data['author'])->map(fn ($author) => trim($author))->unique()->toArray();
+        $data['categoryId'] = collect($data['categoryId'])->map(fn ($author) => (int) trim($author))->unique()->toArray();
         $data['createdBy'] = $id;
         $data['updatedBy'] = $id;
 
         $this->book->create($data);
+
         return $this->sendJson(null, StatusCode::STATUS_CREATED, 'Book created successfully.');
     }
 }

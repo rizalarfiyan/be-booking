@@ -9,7 +9,6 @@ use MeekroDBException;
 
 class BookRepository extends BaseRepository
 {
-
     /**
      * Insert book.
      *
@@ -56,7 +55,6 @@ class BookRepository extends BaseRepository
         $this->db->insert('book_categories', $bookCategories);
     }
 
-
     /**
      * Delete books.
      *
@@ -91,5 +89,35 @@ class BookRepository extends BaseRepository
         ], 'book_id = %s', $payload['book_id']);
 
         return $this->db->affectedRows();
+    }
+
+    /**
+     * Get book by id.
+     *
+     * @param int $id
+     * @return mixed
+     */
+    public function getById(int $id): mixed
+    {
+        // TODO: update the query
+        return $this->db->queryFirstRow('SELECT * FROM books WHERE book_id = %s', $id);
+    }
+
+    /**
+     * Get book category by book id.
+     *
+     * @param int $id
+     * @return mixed
+     */
+    public function getCategoryByBookId(int $id): mixed
+    {
+        $query = 'WITH bcs AS (
+            SELECT category_id from book_categories where book_id = %s
+        )
+        SELECT c.category_id, c.name, c.slug FROM bcs
+        JOIN categories c USING (category_id)
+        WHERE c.deleted_at IS NULL';
+
+        return $this->db->query($query, $id);
     }
 }
