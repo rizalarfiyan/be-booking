@@ -120,4 +120,21 @@ class BookRepository extends BaseRepository
 
         return $this->db->query($query, $id);
     }
+
+    /**
+     * Update book stock.
+     *
+     * @param $payload
+     * @return int
+     * @throws MeekroDBException
+     */
+    public function updateStock($payload): int
+    {
+        $this->db->update('books', [
+            'stock' => $payload['stock'],
+            'updated_by' => $payload['updated_by'],
+        ], 'book_id = %s', $payload['book_id']);
+
+        return $this->db->affectedRows();
+    }
 }

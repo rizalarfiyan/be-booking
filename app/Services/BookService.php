@@ -39,7 +39,6 @@ class BookService
      */
     public static function response($book, bool $idDetail = false): array
     {
-        // TODO: update this method to return the correct data
         $data = [
             'bookId' => (int) $book['book_id'],
             'title' => $book['title'],
@@ -160,6 +159,31 @@ class BookService
             }
 
             throw new UnprocessableEntitiesException('Book could not be created, please contact administrator.');
+        }
+    }
+
+    /**
+     * Update book stock.
+     *
+     * @param $payload
+     * @return void
+     * @throws BadRequestException
+     * @throws UnprocessableEntitiesException
+     */
+    public function update($payload): void
+    {
+        try {
+            $this->book->updateStock($payload);
+        } catch (Throwable $e) {
+            errorLog($e);
+
+            if ($e->getCode() === 1644) {
+                throw new BadRequestException(CoreConstants::VALIDATION_MESSAGE, [
+                    'stock' => $e->getMessage(),
+                ]);
+            }
+
+            throw new UnprocessableEntitiesException('Book stock could not be updated, please try again later.');
         }
     }
 
