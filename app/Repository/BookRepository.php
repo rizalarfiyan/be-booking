@@ -122,6 +122,16 @@ class BookRepository extends BaseRepository
     }
 
     /**
+     * Get book published year.
+     *
+     * @return mixed
+     */
+    public function getPublishedYear(): mixed
+    {
+        return $this->db->query('SELECT DISTINCT YEAR(published_at) as year FROM books WHERE deleted_at IS NULL ORDER BY year DESC');
+    }
+
+    /**
      * Update book stock.
      *
      * @param $payload

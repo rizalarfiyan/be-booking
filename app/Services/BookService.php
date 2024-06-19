@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Repository\BookRepository;
+use App\Repository\CategoryRepository;
 use Booking\Constants as CoreConstants;
 use Booking\Exception\BadRequestException;
 use Booking\Exception\NotFoundException;
@@ -21,6 +22,9 @@ class BookService
     /** @var BookRepository */
     protected BookRepository $book;
 
+    /** @var CategoryRepository */
+    protected CategoryRepository $category;
+
     /**
      * @param BaseRepository $repo
      */
@@ -28,6 +32,7 @@ class BookService
     {
         $this->repo = $repo->db();
         $this->book = new BookRepository($this->repo);
+        $this->category = new CategoryRepository($this->repo);
     }
 
     /**
@@ -40,12 +45,12 @@ class BookService
     public static function response($book, bool $idDetail = false): array
     {
         $data = [
-            'bookId' => (int) $book['book_id'],
+            'bookId' => (int)$book['book_id'],
             'title' => $book['title'],
             'slug' => $book['slug'],
-            'image' => config('app.url').$book['image'],
+            'image' => config('app.url') . $book['image'],
             'language' => $book['language'],
-            'rating' => (float) $book['rating'],
+            'rating' => (float)$book['rating'],
             'publishedAt' => $book['published_at'],
             'createdAt' => $book['created_at'],
             'deletedAt' => $book['deleted_at'],
@@ -55,21 +60,21 @@ class BookService
             $data['isbn'] = $book['isbn'];
             $data['sku'] = $book['sku'];
             $data['author'] = json_decode($book['author']);
-            $data['pages'] = (int) $book['pages'];
-            $data['weight'] = (float) $book['weight'];
-            $data['width'] = (int) $book['width'];
-            $data['height'] = (int) $book['height'];
+            $data['pages'] = (int)$book['pages'];
+            $data['weight'] = (float)$book['weight'];
+            $data['width'] = (int)$book['width'];
+            $data['height'] = (int)$book['height'];
             $data['description'] = $book['description'];
-            $data['createdBy'] = (int) $book['created_by'];
+            $data['createdBy'] = (int)$book['created_by'];
             $data['updatedAt'] = $book['updated_at'];
-            $data['updatedBy'] = (int) $book['updated_by'];
-            $data['deletedBy'] = (int) $book['deleted_by'];
+            $data['updatedBy'] = (int)$book['updated_by'];
+            $data['deletedBy'] = (int)$book['deleted_by'];
         }
 
         if ($book['category']) {
             $data['category'] = collect($book['category'])->map(function ($category) {
                 return [
-                    'categoryId' => (int) $category['category_id'],
+                    'categoryId' => (int)$category['category_id'],
                     'name' => $category['name'],
                     'slug' => $category['slug'],
                 ];
@@ -93,11 +98,11 @@ class BookService
             $data = $this->book->getById($id);
         } catch (Throwable $t) {
             errorLog($t);
-            throw new NotFoundException('Failed to get all book.');
+            throw new UnprocessableEntitiesException('Failed to get all book.');
         }
 
-        if (! $data) {
-            throw new UnprocessableEntitiesException('Book not found.');
+        if (!$data) {
+            throw new NotFoundException('Book not found.');
         }
 
         try {
@@ -108,6 +113,32 @@ class BookService
         }
 
         return self::response($data, true);
+    }
+
+    /**
+     * Get category by id.
+     *
+     * @return array
+     * @throws UnprocessableEntitiesException
+     */
+    public function getFilter(): array
+    {
+        try {
+            $published = $this->book->getPublishedYear();
+            $category = $this->category->getAllActive();
+        } catch (Throwable $t) {
+            errorLog($t);
+            throw new UnprocessableEntitiesException('Failed to get book filter.');
+        }
+
+        return [
+            'year' => collect($published)->map(fn($year) => (int)$year['year'])->toArray(),
+            'category' => collect($category)->map(fn($category) => [
+                'categoryId' => (int)$category['category_id'],
+                'name' => $category['name'],
+                'slug' => $category['slug'],
+            ])->toArray(),
+        ];
     }
 
     /**
@@ -128,7 +159,7 @@ class BookService
             removeFile($payload['image']);
             errorLog($t);
 
-            infoLog($t->getCode().'');
+            infoLog($t->getCode() . '');
 
             if ($t->getCode() === 1062) {
                 $message = $t->getMessage();

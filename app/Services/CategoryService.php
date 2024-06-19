@@ -121,11 +121,11 @@ class CategoryService
             $data = $this->category->getById($id);
         } catch (Throwable $t) {
             errorLog($t);
-            throw new NotFoundException('Failed to get all category.');
+            throw new UnprocessableEntitiesException('Failed to get all category.');
         }
 
         if (! $data) {
-            throw new UnprocessableEntitiesException('Category not found.');
+            throw new NotFoundException('Category not found.');
         }
 
         return self::response($data, true);

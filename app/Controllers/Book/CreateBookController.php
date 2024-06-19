@@ -38,7 +38,6 @@ class CreateBookController extends BaseBookController
             ->key('height', v::floatVal())
             ->key('width', v::floatVal())
             ->key('language', v::stringType()->length(2, 20))
-            ->key('year', v::intVal()->between(1900, date('Y')))
             ->key('publishedAt', v::date())
             ->key('description', v::stringType());
 

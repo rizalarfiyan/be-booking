@@ -35,6 +35,7 @@ $router->group('/api/v1/', function ($router) {
     });
 
     $router->group('/book', function ($router) use ($auth, $admin) {
+        $router->get('/filter', App\Controllers\Book\FilterBookController::class);
         $router->post('/', App\Controllers\Book\CreateBookController::class, [$auth, $admin]);
         $router->put('/{id}/stock', App\Controllers\Book\UpdateStockController::class, [$auth, $admin]);
         $router->get('/{id}', App\Controllers\Book\DetailBookController::class);
