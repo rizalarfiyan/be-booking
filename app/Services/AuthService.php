@@ -248,6 +248,7 @@ class AuthService
             $mail->Body = $mailer->getTemplate('verification', [
                 'name' => $fullName,
                 'url' => $url,
+                'image' => config('url.fe').'/images/email/verification.png',
             ]);
             $mail->AltBody = "Hi $fullName, Please verify your email by clicking the link below: $url";
             $mail->send();
@@ -367,6 +368,7 @@ class AuthService
             $mail->Body = $mailer->getTemplate('reset_password', [
                 'name' => $fullName,
                 'url' => $url,
+                'image' => config('url.fe').'/images/email/reset_password.png',
             ]);
             $mail->AltBody = "Hi $fullName, Please reset your password by clicking the link below: $url";
             $mail->send();
