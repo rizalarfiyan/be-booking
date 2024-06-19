@@ -162,7 +162,7 @@ class BookRepository extends BaseRepository
      */
     public function getPublishedYear(): mixed
     {
-        return $this->db->query('SELECT DISTINCT YEAR(published_at) AS YEAR FROM books WHERE deleted_at IS NULL ORDER BY YEAR DESC');
+        return $this->db->query('SELECT DISTINCT YEAR(published_at) AS year FROM books WHERE deleted_at IS NULL ORDER BY YEAR DESC');
     }
 
     /**
