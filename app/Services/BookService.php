@@ -115,8 +115,31 @@ class BookService
         return self::response($data, true);
     }
 
+
     /**
      * Get category by id.
+     *
+     * @param int $id
+     * @return array
+     * @throws UnprocessableEntitiesException
+     */
+    public function getStock(int $id): array
+    {
+        try {
+            $data = $this->book->getStock($id);
+        } catch (Throwable $t) {
+            errorLog($t);
+            throw new UnprocessableEntitiesException('Failed to get stock book.');
+        }
+
+        return [
+            'stock' => (int)$data['stock'],
+            'borrow' => (int)$data['borrow'],
+        ];
+    }
+
+    /**
+     * Get filter
      *
      * @return array
      * @throws UnprocessableEntitiesException

@@ -10,17 +10,15 @@ use Booking\Message\StatusCodeInterface as StatusCode;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class DetailBookController extends BaseBookController
+class StockBookController extends BaseBookController
 {
     /**
-     * @throws NotFoundException
      * @throws UnprocessableEntitiesException
      */
     public function __invoke(int $id, ServerRequestInterface $req): ResponseInterface
     {
-        // TODO: get condition if user is admin, you can show all deleted book
-        $data = $this->book->getDetail($id);
+        $data = $this->book->getStock($id);
 
-        return $this->sendJson($data, StatusCode::STATUS_OK, 'Book Successfully Requested.');
+        return $this->sendJson($data, StatusCode::STATUS_OK, 'Get Book Stock Successfully.');
     }
 }

@@ -103,6 +103,18 @@ class BookRepository extends BaseRepository
         return $this->db->queryFirstRow('SELECT * FROM books WHERE book_id = %s', $id);
     }
 
+
+    /**
+     * Get book stock.
+     *
+     * @param int $id
+     * @return mixed
+     */
+    public function getStock(int $id): mixed
+    {
+        return $this->db->queryFirstRow('SELECT stock, borrow FROM books WHERE book_id = %s', $id);
+    }
+
     /**
      * Get book category by book id.
      *
