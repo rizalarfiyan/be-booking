@@ -91,6 +91,26 @@ class BookService
     }
 
     /**
+     * Get list books.
+     *
+     * @param $payload
+     * @return array
+     * @throws UnprocessableEntitiesException
+     */
+    public function getList($payload): array
+    {
+        try {
+            return [
+                'content' => collect($this->book->getList($payload))->map(fn($book) => self::response($book, 'card')),
+                'total' => $this->book->countList($payload),
+            ];
+        } catch (Throwable $t) {
+            errorLog($t);
+            throw new UnprocessableEntitiesException('Failed to get list book.');
+        }
+    }
+
+    /**
      * Get category by id.
      *
      * @param int $id
