@@ -30,6 +30,7 @@ class CreateCategoryController extends BaseCategoryController
 
         $validation->assert($data);
         $data['created_by'] = $id;
+        $data['updated_by'] = $id;
         $this->category->insert($data);
 
         return $this->sendJson(null, StatusCode::STATUS_CREATED, 'Category created successfully.');

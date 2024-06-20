@@ -103,6 +103,7 @@ class CategoryRepository extends BaseRepository
             'name' => $payload['name'],
             'slug' => $payload['slug'],
             'created_by' => $payload['created_by'],
+            'updated_by' => $payload['updated_by'],
         ]);
 
         return $this->db->insertId();
