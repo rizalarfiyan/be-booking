@@ -189,16 +189,17 @@ class BookRepository extends BaseRepository
     protected function baseGetList($payload): WhereClause
     {
         $where = new WhereClause('and');
+        $where->add('b.deleted_at IS NULL');
 
         if (!empty($payload['year'])) {
             $where->add('YEAR(b.published_at) = %d', $payload['year']);
         }
 
         if (!empty($payload['search'])) {
-            $where->addClause('or');
-            $where->add('b.title like %s', "%{$payload['search']}%");
-            $where->add('b.author like %s', "%{$payload['search']}%");
-            $where->add('b.isbn like %s', "%{$payload['search']}%");
+            $lcSearch = strtolower($payload['search']);
+            $orWhere = $where->addClause('or');
+            $orWhere->add('b.title like %s', "%{$payload['search']}%");
+            $orWhere->add("JSON_SEARCH(LOWER(JSON_UNQUOTE(b.author)), 'one', %s, NULL, '$[*]') IS NOT NULL", "%{$lcSearch}%");
         }
 
         if (!empty($payload['categoryId'])) {
@@ -261,5 +262,47 @@ class BookRepository extends BaseRepository
             $join = "JOIN book_categories bc USING (book_id)";
         }
         return (int)$this->db->queryFirstField('SELECT COUNT(*) FROM books b %l WHERE %l', $join, $condition) ?? 0;
+    }
+
+
+    /**
+     * @param $payload
+     * @return WhereClause
+     */
+    protected function baseGetAll($payload): WhereClause
+    {
+        $where = new WhereClause('or');
+        if (!empty($payload['search'])) {
+            $where->add('b.title like %s', "%{$payload['search']}%");
+            $where->add('b.author like %s', "%{$payload['search']}%");
+            $where->add('b.isbn like %s', "%{$payload['search']}%");
+        }
+
+        return $where;
+    }
+
+    /**
+     * @param $payload
+     * @return mixed
+     */
+    public function getAll($payload): mixed
+    {
+        $condition = $this->baseGetAll($payload);
+        $orderBy = columnValidation([
+            'created_at',
+        ], $payload['orderType']) ?? 'created_at';
+        $orderType = columnValidation(['ASC', 'DESC'], $payload['orderType']) ?? 'ASC';
+        return $this->db->query('SELECT * FROM books b WHERE %l ORDER BY %l %l LIMIT %d OFFSET %d', $condition, $orderBy, $orderType, $payload['count'], $payload['page'] * $payload['count']);
+    }
+
+    /**
+     * @param $payload
+     * @return int
+     */
+    public function countAll($payload): int
+    {
+        $condition = $this->baseGetList($payload);
+
+        return (int)$this->db->queryFirstField('SELECT COUNT(*) FROM books b WHERE %l', $condition) ?? 0;
     }
 }

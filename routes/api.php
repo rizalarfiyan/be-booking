@@ -37,6 +37,7 @@ $router->group('/api/v1/', function ($router) {
     $router->group('/book', function ($router) use ($auth, $admin) {
         $router->get('/filter', App\Controllers\Book\FilterBookController::class);
         $router->post('/', App\Controllers\Book\CreateBookController::class, [$auth, $admin]);
+        $router->get('/', App\Controllers\Book\AllBookController::class, [$auth, $admin]);
         $router->get('/list', App\Controllers\Book\ListBookController::class);
         $router->get('/{id:\d+}', App\Controllers\Book\DetailBookController::class);
         $router->get('/{id:\d+}/recommendation', App\Controllers\Book\RecommendationBookController::class);

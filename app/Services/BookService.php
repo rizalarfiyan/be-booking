@@ -91,6 +91,26 @@ class BookService
     }
 
     /**
+     * Get all book.
+     *
+     * @param $payload
+     * @return array
+     * @throws UnprocessableEntitiesException
+     */
+    public function getAll($payload): array
+    {
+        try {
+            return [
+                'content' => collect($this->book->getAll($payload))->map(fn($contact) => self::response($contact, 'all')),
+                'total' => $this->book->countAll($payload),
+            ];
+        } catch (Throwable $t) {
+            errorLog($t);
+            throw new UnprocessableEntitiesException('Failed to get all books.');
+        }
+    }
+
+    /**
      * Get list books.
      *
      * @param $payload
