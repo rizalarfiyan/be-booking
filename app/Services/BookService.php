@@ -52,18 +52,21 @@ class BookService
             'rating' => (float)$book['rating'],
         ];
 
-        if (in_array($type, ['all', 'detail'])) {
+        if (in_array($type, ['all', 'detail', 'detail-information'])) {
             $data['language'] = $book['language'];
             $data['publishedAt'] = $book['published_at'];
+        }
+
+        if (in_array($type, ['all', 'detail'])) {
             $data['createdAt'] = $book['created_at'];
             $data['deletedAt'] = $book['deleted_at'];
         }
 
-        if (in_array($type, ['detail', 'card'])) {
+        if (in_array($type, ['detail', 'detail-information', 'card'])) {
             $data['author'] = json_decode($book['author']);
         }
 
-        if ($type === 'detail') {
+        if (in_array($type, ['detail', 'detail-information'])) {
             $data['isbn'] = $book['isbn'];
             $data['sku'] = $book['sku'];
             $data['pages'] = (int)$book['pages'];
@@ -71,6 +74,9 @@ class BookService
             $data['width'] = (int)$book['width'];
             $data['height'] = (int)$book['height'];
             $data['description'] = $book['description'];
+        }
+
+        if ($type === 'detail') {
             $data['createdBy'] = (int)$book['created_by'];
             $data['updatedAt'] = $book['updated_at'];
             $data['updatedBy'] = (int)$book['updated_by'];
@@ -129,6 +135,39 @@ class BookService
             throw new UnprocessableEntitiesException('Failed to get list book.');
         }
     }
+
+
+    /**
+     * Get category by id.
+     *
+     * @param string $slug
+     * @return array
+     * @throws NotFoundException
+     * @throws UnprocessableEntitiesException
+     */
+    public function getDetailInformation(string $slug): array
+    {
+        try {
+            $data = $this->book->getBySlug($slug);
+        } catch (Throwable $t) {
+            errorLog($t);
+            throw new UnprocessableEntitiesException('Failed to get all book.');
+        }
+
+        if (!$data) {
+            throw new NotFoundException('Book not found.');
+        }
+
+        try {
+            $category = $this->book->getCategoryByBookId((int) $data['book_id']);
+            $data['category'] = $category;
+        } catch (Throwable $t) {
+            errorLog($t);
+        }
+
+        return self::response($data, 'detail-information');
+    }
+
 
     /**
      * Get category by id.

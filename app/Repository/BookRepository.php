@@ -104,6 +104,17 @@ class BookRepository extends BaseRepository
         return $this->db->queryFirstRow('SELECT * FROM books WHERE book_id = %d', $id);
     }
 
+    /**
+     * Get book by slug.
+     *
+     * @param string $slug
+     * @return mixed
+     */
+    public function getBySlug(string $slug): mixed
+    {
+        // TODO: update the query
+        return $this->db->queryFirstRow('SELECT * FROM books WHERE slug = %s', $slug);
+    }
 
     /**
      * Get book stock.
@@ -162,7 +173,7 @@ class BookRepository extends BaseRepository
      */
     public function getPublishedYear(): mixed
     {
-        return $this->db->query('SELECT DISTINCT YEAR(published_at) AS year FROM books WHERE deleted_at IS NULL ORDER BY YEAR DESC');
+        return $this->db->query('SELECT DISTINCT YEAR(published_at) AS YEAR FROM books WHERE deleted_at IS NULL ORDER BY YEAR DESC');
     }
 
     /**
