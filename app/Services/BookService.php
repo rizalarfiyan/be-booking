@@ -259,7 +259,7 @@ class BookService
         }
 
         return [
-            'year' => collect($published)->map(fn($year) => (int)$year['year'])->toArray(),
+            'year' => collect($published)->map(fn($year) => (int)$year['published_year'])->toArray(),
             'category' => collect($category)->map(fn($category) => [
                 'categoryId' => (int)$category['category_id'],
                 'name' => $category['name'],
