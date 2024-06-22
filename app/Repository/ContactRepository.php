@@ -64,7 +64,7 @@ class ContactRepository extends BaseRepository
         ], $payload['orderType']) ?? 'created_at';
         $orderType = columnValidation(['ASC', 'DESC'], $payload['orderType']) ?? 'ASC';
 
-        return $this->db->query('SELECT * FROM contacts WHERE %l ORDER BY %l %l LIMIT %d OFFSET %d', $condition, $orderBy, $orderType, $payload['count'], $payload['page'] * $payload['count']);
+        return $this->db->query('SELECT contact_id, first_name, last_name, email, phone, created_at FROM contacts WHERE %l ORDER BY %l %l LIMIT %d OFFSET %d', $condition, $orderBy, $orderType, $payload['count'], $payload['page'] * $payload['count']);
     }
 
     /**
@@ -75,7 +75,7 @@ class ContactRepository extends BaseRepository
     {
         $condition = $this->baseGetAll($payload);
 
-        return (int) $this->db->queryFirstField('SELECT COUNT(*) FROM contacts WHERE %l', $condition) ?? 0;
+        return (int) $this->db->queryFirstField('SELECT COUNT(contact_id) FROM contacts WHERE %l', $condition) ?? 0;
     }
 
     /**
@@ -84,6 +84,6 @@ class ContactRepository extends BaseRepository
      */
     public function getById(int $id): mixed
     {
-        return $this->db->queryFirstRow('SELECT * FROM contacts where contact_id = %d', $id);
+        return $this->db->queryFirstRow('SELECT contact_id, first_name, last_name, email, phone, message, is_read, created_at, updated_at FROM contacts where contact_id = %d', $id);
     }
 }

@@ -17,7 +17,7 @@ class VerificationRepository extends BaseRepository
      */
     public function getByCode(string $code): mixed
     {
-        return $this->db->queryFirstRow('SELECT * FROM verifications where code = %s', $code);
+        return $this->db->queryFirstRow('SELECT verification_id, user_id, code, type, created_at, expired_at FROM verifications where code = %s', $code);
     }
 
     /**

@@ -100,8 +100,7 @@ class BookRepository extends BaseRepository
      */
     public function getById(int $id): mixed
     {
-        // TODO: update the query
-        return $this->db->queryFirstRow('SELECT * FROM books WHERE book_id = %d', $id);
+        return $this->db->queryFirstRow('SELECT book_id, isbn, sku, author, title, slug, image, pages, weight, height, width, language, description, stock, getBookRating(rating, rating_count) AS rating, borrowed, borrowed_count, published_at, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM books WHERE book_id = %d', $id);
     }
 
     /**
@@ -112,8 +111,7 @@ class BookRepository extends BaseRepository
      */
     public function getBySlug(string $slug): mixed
     {
-        // TODO: update the query
-        return $this->db->queryFirstRow('SELECT * FROM books WHERE slug = %s', $slug);
+        return $this->db->queryFirstRow('SELECT book_id, isbn, sku, author, title, slug, image, pages, weight, height, width, language, description, stock, getBookRating(rating, rating_count) AS rating, borrowed, borrowed_count, published_at, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM books WHERE slug = %s AND deleted_at IS NULL', $slug);
     }
 
     /**
@@ -257,7 +255,7 @@ class BookRepository extends BaseRepository
             $join = "JOIN book_categories bc USING (book_id)";
         }
 
-        return $this->db->query('SELECT * FROM books b %l WHERE %l ORDER BY %l LIMIT %d OFFSET %d', $join, $condition, $this->getListOrder($orderBy), $payload['count'], $payload['page'] * $payload['count']);
+        return $this->db->query('SELECT book_id, author, title, slug, image, getBookRating(rating, rating_count) AS rating FROM books b %l WHERE %l ORDER BY %l LIMIT %d OFFSET %d', $join, $condition, $this->getListOrder($orderBy), $payload['count'], $payload['page'] * $payload['count']);
     }
 
     /**
@@ -272,7 +270,7 @@ class BookRepository extends BaseRepository
         if (!empty($payload['categoryId'])) {
             $join = "JOIN book_categories bc USING (book_id)";
         }
-        return (int)$this->db->queryFirstField('SELECT COUNT(*) FROM books b %l WHERE %l', $join, $condition) ?? 0;
+        return (int)$this->db->queryFirstField('SELECT COUNT(book_id) FROM books b %l WHERE %l', $join, $condition) ?? 0;
     }
 
 
@@ -303,7 +301,7 @@ class BookRepository extends BaseRepository
             'created_at',
         ], $payload['orderType']) ?? 'created_at';
         $orderType = columnValidation(['ASC', 'DESC'], $payload['orderType']) ?? 'ASC';
-        return $this->db->query('SELECT * FROM books b WHERE %l ORDER BY %l %l LIMIT %d OFFSET %d', $condition, $orderBy, $orderType, $payload['count'], $payload['page'] * $payload['count']);
+        return $this->db->query('SELECT book_id, title, slug, image, rating, stock, borrowed, published_at, created_at, deleted_at FROM books b WHERE %l ORDER BY %l %l LIMIT %d OFFSET %d', $condition, $orderBy, $orderType, $payload['count'], $payload['page'] * $payload['count']);
     }
 
     /**
@@ -314,6 +312,6 @@ class BookRepository extends BaseRepository
     {
         $condition = $this->baseGetList($payload);
 
-        return (int)$this->db->queryFirstField('SELECT COUNT(*) FROM books b WHERE %l', $condition) ?? 0;
+        return (int)$this->db->queryFirstField('SELECT COUNT(book_id) FROM books b WHERE %l', $condition) ?? 0;
     }
 }

@@ -26,9 +26,9 @@ abstract class AbstractController implements ControllerInterface
      * @param $default
      * @return int|null
      */
-    public function parseNumeric($value, $default = null): int|null
+    public function parseNumeric($value, $key, $default = null): int|null
     {
-        return isset($value) ? is_numeric($value) ? (int)$value : $default : $default;
+        return isset($value[$key]) ? is_numeric($value[$key]) ? (int)$value[$key] : $default : $default;
     }
 
     /**
@@ -41,8 +41,8 @@ abstract class AbstractController implements ControllerInterface
     public function getDatatable(ServerRequestInterface $request): array
     {
         $query = $request->getQueryParams();
-        $count = $this->parseNumeric($query['count']);
-        $page = $this->parseNumeric($query['count'], 0);
+        $count = $this->parseNumeric($query, 'count');
+        $page = $this->parseNumeric($query, 'page', 0);
 
         return [
             'page' => $page > 0 ? $page - 1 : 0,

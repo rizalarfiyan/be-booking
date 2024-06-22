@@ -44,7 +44,7 @@ class CategoryRepository extends BaseRepository
         ], $payload['orderType']) ?? 'created_at';
         $orderType = columnValidation(['ASC', 'DESC'], $payload['orderType']) ?? 'ASC';
 
-        return $this->db->query('SELECT * FROM categories WHERE %l ORDER BY %l %l LIMIT %d OFFSET %d', $condition, $orderBy, $orderType, $payload['count'], $payload['page'] * $payload['count']);
+        return $this->db->query('SELECT category_id, name, slug, created_at, deleted_at FROM categories WHERE %l ORDER BY %l %l LIMIT %d OFFSET %d', $condition, $orderBy, $orderType, $payload['count'], $payload['page'] * $payload['count']);
     }
 
     /**
@@ -52,7 +52,7 @@ class CategoryRepository extends BaseRepository
      */
     public function getAllActive(): mixed
     {
-        return $this->db->query('SELECT category_id, name, slug FROM categories WHERE deleted_at IS NULL ORDER BY name');
+        return $this->db->query('SELECT category_id, name FROM categories WHERE deleted_at IS NULL ORDER BY name');
     }
 
     /**
@@ -77,7 +77,7 @@ class CategoryRepository extends BaseRepository
     {
         $condition = $this->baseGetAll($payload);
 
-        return (int) $this->db->queryFirstField('SELECT COUNT(*) FROM categories WHERE %l', $condition) ?? 0;
+        return (int) $this->db->queryFirstField('SELECT COUNT(category_id) FROM categories WHERE %l', $condition) ?? 0;
     }
 
     /**
@@ -88,7 +88,7 @@ class CategoryRepository extends BaseRepository
      */
     public function getById(int $id): mixed
     {
-        return $this->db->queryFirstRow('SELECT * FROM categories WHERE category_id = %d', $id);
+        return $this->db->queryFirstRow('SELECT category_id, name, slug, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM categories WHERE category_id = %d', $id);
     }
 
     /**

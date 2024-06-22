@@ -52,8 +52,12 @@ class BookService
             'rating' => (float)$book['rating'],
         ];
 
+        if ($type == 'all') {
+            $data['stock'] = (int)$book['stock'];
+            $data['borrowed'] = (int)$book['borrowed'];
+        }
+
         if (in_array($type, ['all', 'detail', 'detail-information'])) {
-            $data['language'] = $book['language'];
             $data['publishedAt'] = $book['published_at'];
         }
 
@@ -73,6 +77,7 @@ class BookService
             $data['weight'] = (float)$book['weight'];
             $data['width'] = (int)$book['width'];
             $data['height'] = (int)$book['height'];
+            $data['language'] = $book['language'];
             $data['description'] = $book['description'];
         }
 
@@ -159,7 +164,7 @@ class BookService
         }
 
         try {
-            $category = $this->book->getCategoryByBookId((int) $data['book_id']);
+            $category = $this->book->getCategoryByBookId((int)$data['book_id']);
             $data['category'] = $category;
         } catch (Throwable $t) {
             errorLog($t);
