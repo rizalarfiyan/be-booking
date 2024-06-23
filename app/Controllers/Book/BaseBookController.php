@@ -57,7 +57,7 @@ class BaseBookController extends Controller
         $validation->assert($data);
 
         $file = $req->getUploadedFiles();
-        if (!$isEdit || isset($file['image'])) {
+        if (! $isEdit || isset($file['image'])) {
             $validation = v::key('image', v::notBlank());
             $validation->assert($file);
 
@@ -68,7 +68,7 @@ class BaseBookController extends Controller
                 ]);
             }
 
-            if (!in_array($image->getClientMediaType(), ['image/jpeg', 'image/jpg', 'image/png'])) {
+            if (! in_array($image->getClientMediaType(), ['image/jpeg', 'image/jpg', 'image/png'])) {
                 throw new BadRequestException(Constants::VALIDATION_MESSAGE, [
                     'image' => 'Invalid image file type.',
                 ]);
@@ -86,10 +86,11 @@ class BaseBookController extends Controller
         }
 
         $data['image'] = $filename ?? null;
-        $data['author'] = collect($data['author'])->map(fn($author) => trim($author))->unique()->toArray();
-        $data['category'] = collect($data['category'])->map(fn($author) => (int)trim($author))->unique()->toArray();
+        $data['author'] = collect($data['author'])->map(fn ($author) => trim($author))->unique()->toArray();
+        $data['category'] = collect($data['category'])->map(fn ($author) => (int) trim($author))->unique()->toArray();
         $data['createdBy'] = $id;
         $data['updatedBy'] = $id;
+
         return $data;
     }
 }
