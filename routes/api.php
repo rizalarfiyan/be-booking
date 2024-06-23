@@ -47,4 +47,9 @@ $router->group('/api/v1/', function ($router) {
         $router->post('/{id:\d+}', App\Controllers\Book\EditBookController::class, [$auth, $admin]);
         $router->delete('/{id:\d+}', App\Controllers\Book\DeleteBookController::class, [$auth, $admin]);
     });
+
+    $router->group('/leaderboard', function ($router) use ($auth) {
+        $router->get('/top', App\Controllers\Leaderboard\GetTopLeaderboardRankController::class, [$auth]);
+        $router->get('/', App\Controllers\Leaderboard\GetCurrentRankController::class, [$auth]);
+    });
 });

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Constants;
 use Booking\Repository\BaseRepository;
 use MeekroDBException;
 
@@ -75,5 +76,32 @@ class UserRepository extends BaseRepository
         return $this->db->update('users', [
             'password' => $password,
         ], 'user_id=%d', $userId);
+    }
+
+    /**
+     * Get top leaderboard.
+     *
+     * @return mixed
+     */
+    public function getTopLeaderboard() :mixed
+    {
+        return $this->db->query('SELECT user_id, first_name, last_name, email, points, book_count FROM users ORDER BY points DESC, created_at LIMIT %d', Constants::LEADERBOARD_LIMIT);
+    }
+
+    /**
+     * get current rank of user.
+     *
+     * @param int $userId
+     * @return mixed
+     */
+    public function getCurrentRank(int $userId):mixed
+    {
+        $query = 'WITH user_ranks AS (
+            SELECT user_id, points, ROW_NUMBER() OVER (ORDER BY points DESC, created_at) AS ranking FROM users LIMIT %d
+        ) SELECT points, book_count, COALESCE((SELECT ranking FROM user_ranks WHERE user_id = %d), %s) AS ranking
+        FROM users
+        WHERE user_id = %d';
+
+        return $this->db->queryFirstRow($query, Constants::LEADERBOARD_MAX_RANK, $userId, Constants::LEADERBOARD_MAX_RANK.'+', $userId);
     }
 }

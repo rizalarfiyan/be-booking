@@ -17,4 +17,8 @@ interface Constants
     public const ROLE_ADMIN = 'admin';
 
     public const ROLE_READER = 'reader';
+
+    public const LEADERBOARD_LIMIT = 10;
+
+    public const LEADERBOARD_MAX_RANK = 500;
 }
