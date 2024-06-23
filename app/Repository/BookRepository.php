@@ -240,6 +240,11 @@ class BookRepository extends BaseRepository
         $where = new WhereClause('and');
         $where->add('b.deleted_at IS NULL');
 
+        $rating = $payload['rating'];
+        if (! empty($rating) && $rating > 0 && $rating <= 5) {
+            $where->add('getBookRating(b.rating, b.rating_count) BETWEEN %d AND %d', $rating - 1, $rating);
+        }
+
         if (! empty($payload['year'])) {
             $where->add('YEAR(b.published_at) = %d', $payload['year']);
         }
@@ -268,7 +273,7 @@ class BookRepository extends BaseRepository
             case 'title':
                 return 'b.title ASC';
             case 'rating':
-                return 'b.rating DESC';
+                return 'rating DESC';
             case 'latest':
                 return 'b.created_at DESC';
             default:
@@ -288,7 +293,7 @@ class BookRepository extends BaseRepository
             'popular',
             'rating',
             'latest',
-        ], $payload['orderType']) ?? 'popular';
+        ], $payload['orderBy']) ?? 'popular';
 
         $join = '';
         if (! empty($payload['categoryId'])) {
