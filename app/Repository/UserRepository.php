@@ -17,7 +17,7 @@ class UserRepository extends BaseRepository
      */
     public function getById(int $id): mixed
     {
-        return $this->db->queryFirstRow('SELECT user_id, first_name, last_name, email, status, role, points, book_count FROM users where user_id = %d', $id);
+        return $this->db->queryFirstRow('SELECT user_id, first_name, last_name, email, password, status, role, points, book_count FROM users where user_id = %d', $id);
     }
 
     /**
@@ -28,7 +28,7 @@ class UserRepository extends BaseRepository
      */
     public function getByEmail(string $email): mixed
     {
-        return $this->db->queryFirstRow('SELECT user_id, first_name, last_name, email, status, role, points, book_count FROM users where email = %s', $email);
+        return $this->db->queryFirstRow('SELECT user_id, first_name, last_name, email, password, status, role, points, book_count FROM users where email = %s', $email);
     }
 
     /**

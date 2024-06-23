@@ -45,16 +45,16 @@ class BookService
     public static function response($book, string $type = 'all'): array
     {
         $data = [
-            'bookId' => (int)$book['book_id'],
+            'bookId' => (int) $book['book_id'],
             'title' => $book['title'],
             'slug' => $book['slug'],
-            'image' => config('app.url') . $book['image'],
-            'rating' => (float)$book['rating'],
+            'image' => config('app.url').$book['image'],
+            'rating' => (float) $book['rating'],
         ];
 
         if ($type == 'all') {
-            $data['stock'] = (int)$book['stock'];
-            $data['borrowed'] = (int)$book['borrowed'];
+            $data['stock'] = (int) $book['stock'];
+            $data['borrowed'] = (int) $book['borrowed'];
         }
 
         if (in_array($type, ['all', 'detail', 'detail-information'])) {
@@ -73,25 +73,25 @@ class BookService
         if (in_array($type, ['detail', 'detail-information'])) {
             $data['isbn'] = $book['isbn'];
             $data['sku'] = $book['sku'];
-            $data['pages'] = (int)$book['pages'];
-            $data['weight'] = (float)$book['weight'];
-            $data['width'] = (int)$book['width'];
-            $data['height'] = (int)$book['height'];
+            $data['pages'] = (int) $book['pages'];
+            $data['weight'] = (float) $book['weight'];
+            $data['width'] = (int) $book['width'];
+            $data['height'] = (int) $book['height'];
             $data['language'] = $book['language'];
             $data['description'] = $book['description'];
         }
 
         if ($type === 'detail') {
-            $data['createdBy'] = (int)$book['created_by'];
+            $data['createdBy'] = (int) $book['created_by'];
             $data['updatedAt'] = $book['updated_at'];
-            $data['updatedBy'] = (int)$book['updated_by'];
-            $data['deletedBy'] = (int)$book['deleted_by'];
+            $data['updatedBy'] = (int) $book['updated_by'];
+            $data['deletedBy'] = (int) $book['deleted_by'];
         }
 
         if (isset($book['category'])) {
             $data['category'] = collect($book['category'])->map(function ($category) {
                 return [
-                    'categoryId' => (int)$category['category_id'],
+                    'categoryId' => (int) $category['category_id'],
                     'name' => $category['name'],
                     'slug' => $category['slug'],
                 ];
@@ -112,7 +112,7 @@ class BookService
     {
         try {
             return [
-                'content' => collect($this->book->getAll($payload))->map(fn($contact) => self::response($contact, 'all')),
+                'content' => collect($this->book->getAll($payload))->map(fn ($contact) => self::response($contact, 'all')),
                 'total' => $this->book->countAll($payload),
             ];
         } catch (Throwable $t) {
@@ -132,7 +132,7 @@ class BookService
     {
         try {
             return [
-                'content' => collect($this->book->getList($payload))->map(fn($book) => self::response($book, 'card')),
+                'content' => collect($this->book->getList($payload))->map(fn ($book) => self::response($book, 'card')),
                 'total' => $this->book->countList($payload),
             ];
         } catch (Throwable $t) {
@@ -140,7 +140,6 @@ class BookService
             throw new UnprocessableEntitiesException('Failed to get list book.');
         }
     }
-
 
     /**
      * Get category by id.
@@ -159,12 +158,12 @@ class BookService
             throw new UnprocessableEntitiesException('Failed to get all book.');
         }
 
-        if (!$data) {
+        if (! $data) {
             throw new NotFoundException('Book not found.');
         }
 
         try {
-            $category = $this->book->getCategoryByBookId((int)$data['book_id']);
+            $category = $this->book->getCategoryByBookId((int) $data['book_id']);
             $data['category'] = $category;
         } catch (Throwable $t) {
             errorLog($t);
@@ -172,7 +171,6 @@ class BookService
 
         return self::response($data, 'detail-information');
     }
-
 
     /**
      * Get category by id.
@@ -191,7 +189,7 @@ class BookService
             throw new UnprocessableEntitiesException('Failed to get all book.');
         }
 
-        if (!$data) {
+        if (! $data) {
             throw new NotFoundException('Book not found.');
         }
 
@@ -204,7 +202,6 @@ class BookService
 
         return self::response($data, 'detail');
     }
-
 
     /**
      * Get category by id.
@@ -222,7 +219,7 @@ class BookService
             throw new UnprocessableEntitiesException('Failed to get book recommendation.');
         }
 
-        return collect($data)->map(fn($book) => self::response($book, 'card'))->toArray();
+        return collect($data)->map(fn ($book) => self::response($book, 'card'))->toArray();
     }
 
     /**
@@ -242,13 +239,13 @@ class BookService
         }
 
         return [
-            'stock' => (int)$data['stock'],
-            'borrow' => (int)$data['borrow'],
+            'stock' => (int) $data['stock'],
+            'borrow' => (int) $data['borrow'],
         ];
     }
 
     /**
-     * Get filter
+     * Get filter.
      *
      * @return array
      * @throws UnprocessableEntitiesException
@@ -264,9 +261,9 @@ class BookService
         }
 
         return [
-            'year' => collect($published)->map(fn($year) => (int)$year['published_year'])->toArray(),
-            'category' => collect($category)->map(fn($category) => [
-                'categoryId' => (int)$category['category_id'],
+            'year' => collect($published)->map(fn ($year) => (int) $year['published_year'])->toArray(),
+            'category' => collect($category)->map(fn ($category) => [
+                'categoryId' => (int) $category['category_id'],
                 'name' => $category['name'],
                 'slug' => $category['slug'],
             ])->toArray(),
@@ -284,14 +281,14 @@ class BookService
         try {
             $this->repo->startTransaction();
             $bookId = $this->book->insert($payload);
-            $this->book->insertCategories($bookId, $payload['categoryId']);
+            $this->book->insertCategories($bookId, $payload['category']);
             $this->repo->commit();
         } catch (Throwable $t) {
             $this->repo->rollback();
             removeFile($payload['image']);
             errorLog($t);
 
-            infoLog($t->getCode() . '');
+            infoLog($t->getCode().'');
 
             if ($t->getCode() === 1062) {
                 $message = $t->getMessage();
@@ -317,7 +314,7 @@ class BookService
 
             if ($t->getCode() === 1452) {
                 throw new BadRequestException(CoreConstants::VALIDATION_MESSAGE, [
-                    'categoryId' => 'Invalid category id.',
+                    'category' => 'Invalid category id.',
                 ]);
             }
 

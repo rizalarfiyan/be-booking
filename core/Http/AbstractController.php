@@ -28,7 +28,7 @@ abstract class AbstractController implements ControllerInterface
      */
     public function parseNumeric($value, $key, $default = null): int|null
     {
-        return isset($value[$key]) ? is_numeric($value[$key]) ? (int)$value[$key] : $default : $default;
+        return isset($value[$key]) ? is_numeric($value[$key]) ? (int) $value[$key] : $default : $default;
     }
 
     /**
@@ -46,7 +46,7 @@ abstract class AbstractController implements ControllerInterface
 
         return [
             'page' => $page > 0 ? $page - 1 : 0,
-            'count' => !empty($count) ? $count : (int)config('app.count'),
+            'count' => ! empty($count) ? $count : (int) config('app.count'),
             'orderBy' => $query['orderBy'] ?? null,
             'orderType' => $query['orderType'] ?? null,
             'search' => $query['search'] ?? null,

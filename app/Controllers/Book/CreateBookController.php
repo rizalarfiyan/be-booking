@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers\Book;
 
 use App\Services\AuthService;
+use Booking\Constants;
 use Booking\Exception\BadRequestException;
 use Booking\Exception\UnauthorizedException;
 use Booking\Exception\UnprocessableEntitiesException;
@@ -30,7 +31,7 @@ class CreateBookController extends BaseBookController
         $validation = v::key('isbn', v::stringType()->length(5, 50))
             ->key('sku', v::stringType()->length(5, 50))
             ->key('author', v::arrayVal()->each(v::stringType()), false)
-            ->key('categoryId', v::arrayVal()->each(v::intVal()))
+            ->key('category', v::arrayVal()->each(v::intVal()))
             ->key('title', v::stringType()->length(5, 120))
             ->key('slug', v::stringType()->length(5, 120))
             ->key('pages', v::intVal())
@@ -43,14 +44,36 @@ class CreateBookController extends BaseBookController
 
         $validation->assert($data);
 
-        $file = $req->getUploadedFiles()['image'];
-        $ext = pathinfo($file->getClientFilename(), PATHINFO_EXTENSION);
+        $file = $req->getUploadedFiles();
+        $validation = v::key('image', v::notBlank());
+        $validation->assert($file);
+
+        $image = $file['image'];
+        if ($image->getError() !== UPLOAD_ERR_OK) {
+            throw new BadRequestException(Constants::VALIDATION_MESSAGE, [
+                'image' => 'Invalid image file.',
+            ]);
+        }
+
+        if (! in_array($image->getClientMediaType(), ['image/jpeg', 'image/png'])) {
+            throw new BadRequestException(Constants::VALIDATION_MESSAGE, [
+                'image' => 'Invalid image file type.',
+            ]);
+        }
+
+        if ($image->getSize() > 1024 * 1024 * 2) {
+            throw new BadRequestException(Constants::VALIDATION_MESSAGE, [
+                'image' => 'Image file size must be less than 2MB.',
+            ]);
+        }
+
+        $ext = pathinfo($image->getClientFilename(), PATHINFO_EXTENSION);
         $filename = sprintf('images/%s.%s', randomStr(64), $ext);
-        $file->moveTo($filename);
+        $image->moveTo($filename);
 
         $data['image'] = $filename;
         $data['author'] = collect($data['author'])->map(fn ($author) => trim($author))->unique()->toArray();
-        $data['categoryId'] = collect($data['categoryId'])->map(fn ($author) => (int) trim($author))->unique()->toArray();
+        $data['category'] = collect($data['category'])->map(fn ($author) => (int) trim($author))->unique()->toArray();
         $data['createdBy'] = $id;
         $data['updatedBy'] = $id;
 

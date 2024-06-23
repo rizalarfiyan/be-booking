@@ -200,18 +200,18 @@ class BookRepository extends BaseRepository
         $where = new WhereClause('and');
         $where->add('b.deleted_at IS NULL');
 
-        if (!empty($payload['year'])) {
+        if (! empty($payload['year'])) {
             $where->add('YEAR(b.published_at) = %d', $payload['year']);
         }
 
-        if (!empty($payload['search'])) {
+        if (! empty($payload['search'])) {
             $lcSearch = strtolower($payload['search']);
             $orWhere = $where->addClause('or');
             $orWhere->add('b.title like %s', "%{$payload['search']}%");
             $orWhere->add("JSON_SEARCH(LOWER(JSON_UNQUOTE(b.author)), 'one', %s, NULL, '$[*]') IS NOT NULL", "%{$lcSearch}%");
         }
 
-        if (!empty($payload['categoryId'])) {
+        if (! empty($payload['categoryId'])) {
             $where->add('bc.category_id = %d', $payload['categoryId']);
         }
 
@@ -250,9 +250,9 @@ class BookRepository extends BaseRepository
             'latest',
         ], $payload['orderType']) ?? 'popular';
 
-        $join = "";
-        if (!empty($payload['categoryId'])) {
-            $join = "JOIN book_categories bc USING (book_id)";
+        $join = '';
+        if (! empty($payload['categoryId'])) {
+            $join = 'JOIN book_categories bc USING (book_id)';
         }
 
         return $this->db->query('SELECT book_id, author, title, slug, image, getBookRating(rating, rating_count) AS rating FROM books b %l WHERE %l ORDER BY %l LIMIT %d OFFSET %d', $join, $condition, $this->getListOrder($orderBy), $payload['count'], $payload['page'] * $payload['count']);
@@ -266,13 +266,13 @@ class BookRepository extends BaseRepository
     {
         $condition = $this->baseGetList($payload);
 
-        $join = "";
-        if (!empty($payload['categoryId'])) {
-            $join = "JOIN book_categories bc USING (book_id)";
+        $join = '';
+        if (! empty($payload['categoryId'])) {
+            $join = 'JOIN book_categories bc USING (book_id)';
         }
-        return (int)$this->db->queryFirstField('SELECT COUNT(book_id) FROM books b %l WHERE %l', $join, $condition) ?? 0;
-    }
 
+        return (int) $this->db->queryFirstField('SELECT COUNT(book_id) FROM books b %l WHERE %l', $join, $condition) ?? 0;
+    }
 
     /**
      * @param $payload
@@ -281,7 +281,7 @@ class BookRepository extends BaseRepository
     protected function baseGetAll($payload): WhereClause
     {
         $where = new WhereClause('or');
-        if (!empty($payload['search'])) {
+        if (! empty($payload['search'])) {
             $where->add('b.title like %s', "%{$payload['search']}%");
             $where->add('b.author like %s', "%{$payload['search']}%");
             $where->add('b.isbn like %s', "%{$payload['search']}%");
@@ -301,6 +301,7 @@ class BookRepository extends BaseRepository
             'created_at',
         ], $payload['orderType']) ?? 'created_at';
         $orderType = columnValidation(['ASC', 'DESC'], $payload['orderType']) ?? 'ASC';
+
         return $this->db->query('SELECT book_id, title, slug, image, rating, stock, borrowed, published_at, created_at, deleted_at FROM books b WHERE %l ORDER BY %l %l LIMIT %d OFFSET %d', $condition, $orderBy, $orderType, $payload['count'], $payload['page'] * $payload['count']);
     }
 
@@ -312,6 +313,6 @@ class BookRepository extends BaseRepository
     {
         $condition = $this->baseGetList($payload);
 
-        return (int)$this->db->queryFirstField('SELECT COUNT(book_id) FROM books b WHERE %l', $condition) ?? 0;
+        return (int) $this->db->queryFirstField('SELECT COUNT(book_id) FROM books b WHERE %l', $condition) ?? 0;
     }
 }
