@@ -16,7 +16,7 @@ class CategoryRepository extends BaseRepository
      */
     protected function baseGetAll($payload): WhereClause
     {
-        $where = new WhereClause('or');
+        $where = new WhereClause('and');
         if (! empty($payload['search'])) {
             $where->add('name like %s', "%{$payload['search']}%");
         }
@@ -44,7 +44,29 @@ class CategoryRepository extends BaseRepository
         ], $payload['orderType']) ?? 'created_at';
         $orderType = columnValidation(['ASC', 'DESC'], $payload['orderType']) ?? 'ASC';
 
-        return $this->db->query('SELECT * FROM categories WHERE %l ORDER BY %l %l LIMIT %d OFFSET %d', $condition, $orderBy, $orderType, $payload['count'], $payload['page'] * $payload['count']);
+        return $this->db->query('SELECT category_id, name, slug, created_at, deleted_at FROM categories WHERE %l ORDER BY %l %l LIMIT %d OFFSET %d', $condition, $orderBy, $orderType, $payload['count'], $payload['page'] * $payload['count']);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAllActive(): mixed
+    {
+        return $this->db->query('SELECT category_id, name, slug FROM categories WHERE deleted_at IS NULL ORDER BY name');
+    }
+
+    /**
+     * @param $payload
+     * @return mixed
+     */
+    public function getAllDropdown($payload): mixed
+    {
+        $where = new WhereClause('and');
+        if (! empty($payload['search'])) {
+            $where->add('name like %s', "%{$payload['search']}%");
+        }
+
+        return $this->db->query('SELECT category_id, name FROM categories WHERE %l ORDER BY name ASC LIMIT %d OFFSET %d', $where, $payload['count'], $payload['page'] * $payload['count']);
     }
 
     /**
@@ -55,7 +77,7 @@ class CategoryRepository extends BaseRepository
     {
         $condition = $this->baseGetAll($payload);
 
-        return (int) $this->db->queryFirstField('SELECT COUNT(*) FROM categories WHERE %l', $condition) ?? 0;
+        return (int) $this->db->queryFirstField('SELECT COUNT(category_id) FROM categories WHERE %l', $condition) ?? 0;
     }
 
     /**
@@ -66,7 +88,7 @@ class CategoryRepository extends BaseRepository
      */
     public function getById(int $id): mixed
     {
-        return $this->db->queryFirstRow('SELECT * FROM categories WHERE category_id = %s', $id);
+        return $this->db->queryFirstRow('SELECT category_id, name, slug, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by FROM categories WHERE category_id = %d', $id);
     }
 
     /**
@@ -81,6 +103,7 @@ class CategoryRepository extends BaseRepository
             'name' => $payload['name'],
             'slug' => $payload['slug'],
             'created_by' => $payload['created_by'],
+            'updated_by' => $payload['updated_by'],
         ]);
 
         return $this->db->insertId();
@@ -99,7 +122,7 @@ class CategoryRepository extends BaseRepository
             'name' => $payload['name'],
             'slug' => $payload['slug'],
             'updated_by' => $payload['updated_by'],
-        ], 'category_id = %s', $payload['category_id']);
+        ], 'category_id = %d', $payload['category_id']);
 
         return $this->db->affectedRows();
     }
@@ -117,7 +140,7 @@ class CategoryRepository extends BaseRepository
             'updated_by' => $payload['updated_by'],
             'deleted_by' => $payload['deleted_by'],
             'deleted_at' => datetime(),
-        ], 'category_id = %s', $payload['category_id']);
+        ], 'category_id = %d', $payload['category_id']);
 
         return $this->db->affectedRows();
     }
@@ -135,7 +158,7 @@ class CategoryRepository extends BaseRepository
             'updated_by' => $payload['updated_by'],
             'deleted_by' => null,
             'deleted_at' => null,
-        ], 'category_id = %s', $payload['category_id']);
+        ], 'category_id = %d', $payload['category_id']);
 
         return $this->db->affectedRows();
     }

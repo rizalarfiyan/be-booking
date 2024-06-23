@@ -195,3 +195,19 @@ if (! function_exists('columnValidation')) {
         return null;
     }
 }
+
+if (! function_exists('removeFile')) {
+    /**
+     * Remove file based on filename.
+     *
+     * @param string|null $filename
+     * @return void
+     */
+    function removeFile(string|null $filename): void
+    {
+        if (! $filename) return;
+        if (file_exists($filename)) {
+            unlink($filename);
+        }
+    }
+}

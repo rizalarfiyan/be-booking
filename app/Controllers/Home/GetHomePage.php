@@ -23,13 +23,7 @@ class GetHomePage extends Controller
     {
         $res = [
             'message' => 'Welcome to the Home API',
-            'data' => [
-                'page' => $this->getCurrentPage($req),
-                'size' => $this->getPageSize($req),
-                'users' => collect($userRepository->getAll())->map(function ($user) {
-                    return collect($user)->only(['user_id', 'first_name', 'last_name', 'email', 'status', 'role']);
-                }),
-            ],
+            'data' => [],
         ];
 
         return $this->json($res);

@@ -35,10 +35,10 @@ class CategoryService
      * Mapping category response.
      *
      * @param $category
-     * @param bool $idDetail
+     * @param bool $isDetail
      * @return array
      */
-    public static function response($category, bool $idDetail = false): array
+    public static function response($category, bool $isDetail = false): array
     {
         $data = [
             'categoryId' => (int) $category['category_id'],
@@ -48,7 +48,7 @@ class CategoryService
             'deletedAt' => $category['deleted_at'],
         ];
 
-        if ($idDetail) {
+        if ($isDetail) {
             $data['createdBy'] = (int) $category['created_by'];
             $data['updatedAt'] = $category['updated_at'];
             $data['updatedBy'] = (int) $category['updated_by'];
@@ -56,6 +56,18 @@ class CategoryService
         }
 
         return $data;
+    }
+
+    /**
+     * @param $category
+     * @return array
+     */
+    public static function dropdownResponse($category): array
+    {
+        return [
+            'value' => (int) $category['category_id'],
+            'label' => $category['name'],
+        ];
     }
 
     /**
@@ -74,7 +86,24 @@ class CategoryService
             ];
         } catch (Throwable $t) {
             errorLog($t);
-            throw new UnprocessableEntitiesException('Failed to get all contacts.');
+            throw new UnprocessableEntitiesException('Failed to get all categories.');
+        }
+    }
+
+    /**
+     * Get all categories.
+     *
+     * @param $payload
+     * @return array
+     * @throws UnprocessableEntitiesException
+     */
+    public function getAllDropdown($payload): array
+    {
+        try {
+            return collect($this->category->getAllDropdown($payload))->map(fn ($contact) => self::dropdownResponse($contact))->toArray();
+        } catch (Throwable $t) {
+            errorLog($t);
+            throw new UnprocessableEntitiesException('Failed to get all categories.');
         }
     }
 
@@ -92,11 +121,11 @@ class CategoryService
             $data = $this->category->getById($id);
         } catch (Throwable $t) {
             errorLog($t);
-            throw new NotFoundException('Failed to get all category.');
+            throw new UnprocessableEntitiesException('Failed to get all category.');
         }
 
         if (! $data) {
-            throw new UnprocessableEntitiesException('Category not found.');
+            throw new NotFoundException('Category not found.');
         }
 
         return self::response($data, true);

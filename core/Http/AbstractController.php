@@ -22,6 +22,16 @@ abstract class AbstractController implements ControllerInterface
     }
 
     /**
+     * @param $value
+     * @param $default
+     * @return int|null
+     */
+    public function parseNumeric($value, $key, $default = null): int|null
+    {
+        return isset($value[$key]) ? is_numeric($value[$key]) ? (int) $value[$key] : $default : $default;
+    }
+
+    /**
      * Get the datatable schema in query string
      * or return a default value.
      *
@@ -31,14 +41,15 @@ abstract class AbstractController implements ControllerInterface
     public function getDatatable(ServerRequestInterface $request): array
     {
         $query = $request->getQueryParams();
-        $count = isset($query['count']) ? is_numeric($query['count']) ? (int) $query['count'] : null : null;
-        $page = isset($query['page']) ? is_numeric($query['page']) ? (int) $query['page'] : 0 : 0;
+        $count = $this->parseNumeric($query, 'count');
+        $page = $this->parseNumeric($query, 'page', 0);
 
         return [
             'page' => $page > 0 ? $page - 1 : 0,
             'count' => ! empty($count) ? $count : (int) config('app.count'),
             'orderBy' => $query['orderBy'] ?? null,
             'orderType' => $query['orderType'] ?? null,
+            'search' => $query['search'] ?? null,
         ];
     }
 
@@ -53,7 +64,6 @@ abstract class AbstractController implements ControllerInterface
     public function listResponse(array $content, array $metadata, int $total = 0): array
     {
         $total = $content['total'];
-        infoLog(json_encode([$metadata['count'], $total]));
 
         return [
             'content' => $content['content'],

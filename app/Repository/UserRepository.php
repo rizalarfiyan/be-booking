@@ -10,16 +10,6 @@ use MeekroDBException;
 class UserRepository extends BaseRepository
 {
     /**
-     * Get all users.
-     *
-     * @return mixed
-     */
-    public function getAll(): mixed
-    {
-        return $this->db->query('SELECT * FROM users');
-    }
-
-    /**
      * Get user by id.
      *
      * @param int $id
@@ -27,7 +17,7 @@ class UserRepository extends BaseRepository
      */
     public function getById(int $id): mixed
     {
-        return $this->db->queryFirstRow('SELECT * FROM users where user_id = %s', $id);
+        return $this->db->queryFirstRow('SELECT user_id, first_name, last_name, email, password, status, role, points, book_count FROM users where user_id = %d', $id);
     }
 
     /**
@@ -38,7 +28,7 @@ class UserRepository extends BaseRepository
      */
     public function getByEmail(string $email): mixed
     {
-        return $this->db->queryFirstRow('SELECT * FROM users where email = %s', $email);
+        return $this->db->queryFirstRow('SELECT user_id, first_name, last_name, email, password, status, role, points, book_count FROM users where email = %s', $email);
     }
 
     /**
@@ -71,7 +61,7 @@ class UserRepository extends BaseRepository
     {
         return $this->db->update('users', [
             'status' => $status,
-        ], 'user_id=%s', $userId);
+        ], 'user_id=%d', $userId);
     }
 
     /**
@@ -84,6 +74,6 @@ class UserRepository extends BaseRepository
     {
         return $this->db->update('users', [
             'password' => $password,
-        ], 'user_id=%s', $userId);
+        ], 'user_id=%d', $userId);
     }
 }

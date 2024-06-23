@@ -7,11 +7,11 @@ CREATE TABLE users
     email      VARCHAR(100) UNIQUE,
     password   VARCHAR(100)                NOT NULL,
     status     ENUM ('active', 'inactive') NOT NULL DEFAULT 'inactive',
-    role       ENUM ('admin', 'guest')     NOT NULL DEFAULT 'guest',
+    role       ENUM ('admin', 'reader')     NOT NULL DEFAULT 'reader',
     points     INT                         NOT NULL DEFAULT 0,
     book_count INT                         NOT NULL DEFAULT 0,
     created_at DATETIME                    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP
+    updated_at DATETIME                    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE verifications

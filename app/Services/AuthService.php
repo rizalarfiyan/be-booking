@@ -148,6 +148,18 @@ class AuthService
     }
 
     /**
+     * @param ServerRequestInterface $request
+     * @return string
+     * @throws UnauthorizedException
+     */
+    public static function getRoleFromToken(ServerRequestInterface $request): string
+    {
+        $token = self::getAuthToken($request);
+
+        return $token->claims()->get('role');
+    }
+
+    /**
      * Validate JWT Token.
      *
      * @param Token $token

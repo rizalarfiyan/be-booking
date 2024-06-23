@@ -17,7 +17,7 @@ class VerificationRepository extends BaseRepository
      */
     public function getByCode(string $code): mixed
     {
-        return $this->db->queryFirstRow('SELECT * FROM verifications where code = %s', $code);
+        return $this->db->queryFirstRow('SELECT verification_id, user_id, code, type, created_at, expired_at FROM verifications where code = %s', $code);
     }
 
     /**
@@ -48,6 +48,6 @@ class VerificationRepository extends BaseRepository
      */
     public function deleteByTypeAndUser(string $type, int $userId): mixed
     {
-        return $this->db->delete('verifications', 'type = %s and user_id = %i', $type, $userId);
+        return $this->db->delete('verifications', 'type = %s and user_id = %d', $type, $userId);
     }
 }

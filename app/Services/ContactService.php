@@ -17,7 +17,7 @@ class ContactService
     protected MeekroDB $repo;
 
     /** @var ContactRepository */
-    protected ContactRepository $user;
+    protected ContactRepository $contact;
 
     /**
      * @param BaseRepository $repo
@@ -25,7 +25,7 @@ class ContactService
     public function __construct(BaseRepository $repo)
     {
         $this->repo = $repo->db();
-        $this->user = new ContactRepository($this->repo);
+        $this->contact = new ContactRepository($this->repo);
     }
 
     /**
@@ -61,7 +61,7 @@ class ContactService
     public function newContact($payload): void
     {
         try {
-            $this->user->insert($payload);
+            $this->contact->insert($payload);
         } catch (Throwable $t) {
             errorLog($t);
             throw new UnprocessableEntitiesException('Failed to send contact.');
@@ -79,8 +79,8 @@ class ContactService
     {
         try {
             return [
-                'content' => collect($this->user->getAll($payload))->map(fn ($contact) => self::response($contact)),
-                'total' => $this->user->countAll($payload),
+                'content' => collect($this->contact->getAll($payload))->map(fn ($contact) => self::response($contact)),
+                'total' => $this->contact->countAll($payload),
             ];
         } catch (Throwable $t) {
             errorLog($t);
@@ -99,7 +99,7 @@ class ContactService
     public function getDetail(int $id): array
     {
         try {
-            $data = $this->user->getById($id);
+            $data = $this->contact->getById($id);
         } catch (Throwable $t) {
             errorLog($t);
             throw new NotFoundException('Failed to get all contacts.');

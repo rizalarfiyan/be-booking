@@ -9,7 +9,7 @@ use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class AllCategoryController extends BaseCategoryController
+class AllDropdownCategoryController extends BaseCategoryController
 {
     /**
      * @param ServerRequestInterface $req
@@ -19,8 +19,8 @@ class AllCategoryController extends BaseCategoryController
     public function __invoke(ServerRequestInterface $req): ResponseInterface
     {
         $metadata = $this->getDatatable($req);
-        $categories = $this->category->getAll($metadata);
+        $categories = $this->category->getAllDropdown($metadata);
 
-        return $this->sendJson($this->listResponse($categories, $metadata), StatusCode::STATUS_OK, 'Get all category successfully.');
+        return $this->sendJson($categories, StatusCode::STATUS_OK, 'Get all category successfully.');
     }
 }

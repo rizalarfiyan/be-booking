@@ -159,3 +159,4 @@ tests/db.sqlite
 .sonar
 tmp
 *.cache
+public/images/*
