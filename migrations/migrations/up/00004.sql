@@ -13,7 +13,7 @@ CREATE TABLE books
     height         SMALLINT            NOT NULL DEFAULT 0,
     width          SMALLINT            NOT NULL DEFAULT 0,
     language       VARCHAR(20)         NOT NULL,
-    description    TEXT                NOT NULL,
+    description    JSON                NOT NULL,
     stock          SMALLINT            NOT NULL DEFAULT 0,
     rating         INT                 NOT NULL DEFAULT 0,
     rating_count   INT                 NOT NULL DEFAULT 0,

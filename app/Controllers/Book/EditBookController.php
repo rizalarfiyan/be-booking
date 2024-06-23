@@ -11,19 +11,21 @@ use Booking\Message\StatusCodeInterface as StatusCode;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class CreateBookController extends BaseBookController
+class EditBookController extends BaseBookController
 {
     /**
+     * @param int $id
      * @param ServerRequestInterface $req
      * @return ResponseInterface
-     * @throws UnauthorizedException
      * @throws BadRequestException
+     * @throws UnauthorizedException
      * @throws UnprocessableEntitiesException
      */
-    public function __invoke(ServerRequestInterface $req): ResponseInterface
+    public function __invoke(int $id, ServerRequestInterface $req): ResponseInterface
     {
-        $data = $this->getPayloadCreateOrEdit($req);
-        $this->book->create($data);
+        $data = $this->getPayloadCreateOrEdit($req, true);
+        $data['book_id'] = $id;
+        $this->book->edit($data);
 
         return $this->sendJson(null, StatusCode::STATUS_CREATED, 'Book created successfully.');
     }
