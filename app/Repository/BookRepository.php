@@ -356,7 +356,7 @@ class BookRepository extends BaseRepository
      */
     public function countAll($payload): int
     {
-        $condition = $this->baseGetList($payload);
+        $condition = $this->baseGetAll($payload);
 
         return (int) $this->db->queryFirstField('SELECT COUNT(book_id) FROM books b WHERE %l', $condition) ?? 0;
     }

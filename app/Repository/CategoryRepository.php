@@ -52,7 +52,7 @@ class CategoryRepository extends BaseRepository
      */
     public function getAllActive(): mixed
     {
-        return $this->db->query('SELECT category_id, name FROM categories WHERE deleted_at IS NULL ORDER BY name');
+        return $this->db->query('SELECT category_id, name, slug FROM categories WHERE deleted_at IS NULL ORDER BY name');
     }
 
     /**
