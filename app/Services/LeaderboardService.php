@@ -43,7 +43,7 @@ class LeaderboardService
         ];
 
         if (! $topRank) {
-            $data['ranking'] = (int) $leaderboard['ranking'];
+            $data['ranking'] = $leaderboard['ranking'];
         }
 
         if ($topRank) {

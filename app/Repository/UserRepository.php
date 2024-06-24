@@ -102,6 +102,6 @@ class UserRepository extends BaseRepository
         FROM users
         WHERE user_id = %d';
 
-        return $this->db->queryFirstRow($query, Constants::LEADERBOARD_MAX_RANK, $userId, Constants::LEADERBOARD_MAX_RANK.'+', $userId);
+        return $this->db->queryFirstRow($query, Constants::LEADERBOARD_MAX_RANK, $userId, Constants::LEADERBOARD_MAX_RANK, $userId);
     }
 }
