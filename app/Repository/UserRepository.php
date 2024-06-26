@@ -98,7 +98,7 @@ class UserRepository extends BaseRepository
     {
         $query = 'WITH user_ranks AS (
             SELECT user_id, points, ROW_NUMBER() OVER (ORDER BY points DESC, created_at) AS ranking FROM users LIMIT %d
-        ) SELECT points, book_count, COALESCE((SELECT ranking FROM user_ranks WHERE user_id = %d), %s) AS ranking
+        ) SELECT user_id, points, book_count, COALESCE((SELECT ranking FROM user_ranks WHERE user_id = %d), %s) AS ranking
         FROM users
         WHERE user_id = %d';
 
