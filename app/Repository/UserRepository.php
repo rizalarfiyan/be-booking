@@ -7,6 +7,7 @@ namespace App\Repository;
 use App\Constants;
 use Booking\Repository\BaseRepository;
 use MeekroDBException;
+use WhereClause;
 
 class UserRepository extends BaseRepository
 {
@@ -33,6 +34,57 @@ class UserRepository extends BaseRepository
     }
 
     /**
+     * @param $payload
+     * @return WhereClause
+     */
+    protected function baseGetAll($payload): WhereClause
+    {
+        $where = new WhereClause('and');
+        if (! empty($payload['search'])) {
+            $where->add('name like %s', "%{$payload['search']}%");
+        }
+
+        return $where;
+    }
+
+    /*
+     * Get all users.
+     * @param $payload
+     * @return mixed
+     *
+     */
+    public function getAll($payload): mixed
+    {
+        $condition = $this->baseGetAll($payload);
+        $orderBy = columnValidation([
+            'user_id',
+            'first_name',
+            'last_name',
+            'email',
+            'status',
+            'role',
+            'points',
+            'book_count',
+            'created_at',
+            'updated_at',
+        ], $payload['orderType']) ?? 'created_at';
+        $orderType = columnValidation(['ASC', 'DESC'], $payload['orderType']) ?? 'ASC';
+
+        return $this->db->query('SELECT user_id, first_name, last_name, email, status, role, points, book_count, created_at, updated_at FROM users WHERE %l ORDER BY %l %l LIMIT %d OFFSET %d', $condition, $orderBy, $orderType, $payload['count'], $payload['page'] * $payload['count']);
+    }
+
+    /**
+     * @param $payload
+     * @return int
+     */
+    public function countAll($payload): int
+    {
+        $condition = $this->baseGetAll($payload);
+
+        return (int) $this->db->queryFirstField('SELECT COUNT(user_id) FROM users WHERE %l', $condition) ?? 0;
+    }
+
+    /**
      * Insert user.
      *
      * @param $payload
@@ -51,8 +103,26 @@ class UserRepository extends BaseRepository
     }
 
     /**
-     * Update user.
+     * Update user details.
      *
+     * @param $payload
+     * @return mixed
+     * @throws MeekroDBException
+     */
+    public function updateUserDetails($payload): mixed
+    {
+        return $this->db->update('users', [
+            'first_name' => $payload['firstName'],
+            'last_name' => $payload['lastName'] ?? '',
+            'email' => $payload['email'],
+            'status' => $payload['status'],
+            'role' => $payload['role'],
+            'password' => $payload['password'],
+        ], 'user_id=%d', $payload['userId']);
+    }
+
+    /**
+     * Update user status.
      * @param string $status
      * @param int $userId
      * @return mixed
@@ -66,6 +136,7 @@ class UserRepository extends BaseRepository
     }
 
     /**
+     * Update user password.
      * @param string $password
      * @param int $userId
      * @return mixed
