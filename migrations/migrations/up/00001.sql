@@ -6,7 +6,7 @@ CREATE TABLE users
     last_name  VARCHAR(50)                 NOT NULL DEFAULT '',
     email      VARCHAR(100) UNIQUE,
     password   VARCHAR(100)                NOT NULL,
-    status     ENUM ('active', 'inactive') NOT NULL DEFAULT 'inactive',
+    status     ENUM ('active', 'inactive', 'banned') NOT NULL DEFAULT 'inactive',
     role       ENUM ('admin', 'reader')     NOT NULL DEFAULT 'reader',
     points     INT                         NOT NULL DEFAULT 0,
     book_count INT                         NOT NULL DEFAULT 0,
