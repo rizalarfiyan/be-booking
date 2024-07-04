@@ -19,9 +19,9 @@ $router->group('/api/v1/', function ($router) {
         $router->get('/me', App\Controllers\Auth\MeAuthController::class, [$auth]);
     });
 
-    $router->group('/contact', function ($router) use ($auth) {
-        $router->get('/', App\Controllers\Contact\AllContactController::class, [$auth]);
-        $router->get('/{id:\d+}', App\Controllers\Contact\DetailContactController::class, [$auth]);
+    $router->group('/contact', function ($router) use ($auth, $admin) {
+        $router->get('/', App\Controllers\Contact\AllContactController::class, [$auth, $admin]);
+        $router->get('/{id:\d+}', App\Controllers\Contact\DetailContactController::class, [$auth, $admin]);
         $router->post('/', App\Controllers\Contact\CreateContactController::class);
     });
 

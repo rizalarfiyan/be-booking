@@ -7,9 +7,11 @@ CREATE TABLE histories
     book_id     INT             NOT NULL,
     status      ENUM ('read', 'success', 'pending', 'cancel') NOT NULL DEFAULT 'pending',
     point       FLOAT           NOT NULL DEFAULT 0,
-    return_at   DATETIME        NOT NULL DEFAULT (CURRENT_TIMESTAMP + INTERVAL 7 DAY),
-    borrow_at   DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    borrow_by   INT             NOT NULL,
+    created_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by  INT             NOT NULL,
+    return_at   DATETIME,
+    borrow_at   DATETIME,
+    borrow_by   INT,
     returned_at datetime,
     returned_by INT,
     FOREIGN KEY (book_id) REFERENCES books (book_id),
@@ -26,4 +28,4 @@ CREATE TABLE rating_histories
     FOREIGN KEY (history_id) REFERENCES histories (history_id)
 );
 
-ALTER TABLE books MODIFY COLUMN rating DECIMAL(20, 2) NOT NULL DEFAULT 0;
+ALTER TABLE books MODIFY COLUMN rating DECIMAL (20, 2) NOT NULL DEFAULT 0;

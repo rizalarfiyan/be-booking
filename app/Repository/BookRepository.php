@@ -166,6 +166,19 @@ class BookRepository extends BaseRepository
     }
 
     /**
+     * Check user has borrow the book or not
+     *
+     * @param int $id
+     * @param int|null $userId
+     * @return mixed
+     */
+    public function hasBorrow(int $id, ?int $userId): mixed
+    {
+        $query = "SELECT COUNT(history_id) > 0 AS result FROM histories WHERE book_id = %d AND user_id = %d AND status IN ('pending', 'read')";
+        return $this->db->queryFirstField($query, $id, $userId);
+    }
+
+    /**
      * Get book category by book id.
      *
      * @param int $id
