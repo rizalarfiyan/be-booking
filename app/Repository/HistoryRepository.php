@@ -53,4 +53,22 @@ class HistoryRepository extends BaseRepository
 
         return (int) $this->db->queryFirstField('SELECT count(history_id) FROM histories h JOIN books b USING (book_id) WHERE %l', $condition) ?? 0;
     }
+
+        /**
+     * Insert history.
+     *
+     * @param $payload
+     * @return int return the id of the inserted history
+     */
+    public function insert($payload): int
+    {
+        $this->db->insert('histories', [
+            'user_id' => $payload['userId'],
+            'book_id' => $payload['bookId'],
+            'borrow_by' => $payload['borrowBy'],
+            'created_by' => $payload['createdBy'],
+        ]);
+
+        return $this->db->insertId();
+    }
 }

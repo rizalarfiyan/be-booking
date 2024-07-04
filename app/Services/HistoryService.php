@@ -36,11 +36,11 @@ class HistoryService
     public static function response($history): array
     {
         return [
-            'historyId' => (int) $history['history_id'],
-            'userId' => (int) $history['user_id'],
+            'historyId' => (int)$history['history_id'],
+            'userId' => (int)$history['user_id'],
             'title' => $history['title'],
             'status' => $history['status'],
-            'point' => (int) $history['point'],
+            'point' => (int)$history['point'],
             'createdAt' => $history['created_at'],
             'returnAt' => $history['return_at'],
             'borrowAt' => $history['borrow_at'],
@@ -65,6 +65,28 @@ class HistoryService
         } catch (Throwable $t) {
             errorLog($t);
             throw new UnprocessableEntitiesException('Failed to get all history.');
+        }
+    }
+
+    /**
+     * Borrow the book.
+     *
+     * @param $payload
+     * @return void
+     * @throws UnprocessableEntitiesException
+     */
+    public function borrow($payload): void
+    {
+        try {
+            $this->history->insert($payload);
+        } catch (Throwable $e) {
+            errorLog($e);
+
+            if ($e->getCode() === 1644) {
+                throw new UnprocessableEntitiesException($e->getMessage());
+            }
+
+            throw new UnprocessableEntitiesException('Cannot borrow the book, please try again later.');
         }
     }
 }
