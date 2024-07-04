@@ -64,4 +64,12 @@ $router->group('/api/v1/', function ($router) {
             $router->post('/forgot-password/{id:\d+}', App\Controllers\User\ResendForgotPasswordUserController::class, [$auth, $admin]);
         });
     });
+    
+    $router->group('/history', function ($router) use ($auth, $admin) {
+        $router->get('/', App\Controllers\History\AllHistoryController::class, [$auth]);
+        // $router->post('/', App\Controllers\Category\CreateCategoryController::class, [$auth, $admin]);
+        // $router->get('/{id:\d+}', App\Controllers\Category\DetailCategoryController::class, [$auth, $admin]);
+        // $router->put('/{id:\d+}', App\Controllers\Category\UpdateCategoryController::class, [$auth, $admin]);
+        // $router->delete('/{id:\d+}', App\Controllers\Category\DeleteCategoryController::class, [$auth, $admin]);
+    });
 });
