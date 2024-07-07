@@ -166,8 +166,7 @@ class UserService
                 throw new NotFoundException('User could not be found, please try again later.');
             }
 
-            $payload['password'] = isset($payload['password']) ? AuthService::hashPassword($payload['password']) : $data['password'];
-            $this->user->updateUserDetails($payload);
+            $this->user->updateUserStatusRole($payload);
         } catch (Throwable $e) {
             errorLog($e);
 

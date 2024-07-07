@@ -22,12 +22,8 @@ class UpdateUserController extends BaseUserController
     {
         $data = $this->parseRequestDataToArray($req);
 
-        $validation = v::key('email', v::stringType()->email())
-            ->key('firstName', v::stringType()->length(3, 50))
-            ->key('lastName', v::stringType()->length(3, 50))
-            ->key('status', v::stringType()->in(['active', 'inactive', 'banned']))
-            ->key('role', v::stringType()->in(['admin', 'reader']))
-            ->key('password', v::stringType()->length(6, 36), false);
+        $validation = v::key('status', v::stringType()->in(['active', 'inactive', 'banned']))
+            ->key('role', v::stringType()->in(['admin', 'reader']));
 
         $validation->assert($data);
         $data['userId'] = $id;

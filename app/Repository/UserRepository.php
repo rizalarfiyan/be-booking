@@ -39,9 +39,10 @@ class UserRepository extends BaseRepository
      */
     protected function baseGetAll($payload): WhereClause
     {
-        $where = new WhereClause('and');
+        $where = new WhereClause('or');
         if (! empty($payload['search'])) {
-            $where->add('name like %s', "%{$payload['search']}%");
+            $where->add("concat(first_name, ' ', last_name) like %s", "%{$payload['search']}%");
+            $where->add("email like %s", "%{$payload['search']}%");
         }
 
         return $where;
@@ -125,21 +126,17 @@ class UserRepository extends BaseRepository
     }
 
     /**
-     * Update user details.
+     * Update user status and user role.
      *
      * @param $payload
      * @return mixed
      * @throws MeekroDBException
      */
-    public function updateUserDetails($payload): mixed
+    public function updateUserStatusRole($payload): mixed
     {
         return $this->db->update('users', [
-            'first_name' => $payload['firstName'],
-            'last_name' => $payload['lastName'] ?? '',
-            'email' => $payload['email'],
             'status' => $payload['status'],
             'role' => $payload['role'],
-            'password' => $payload['password'],
         ], 'user_id=%d', $payload['userId']);
     }
 
