@@ -98,8 +98,6 @@ class UserRepository extends BaseRepository
             'first_name' => $payload['firstName'],
             'last_name' => $payload['lastName'] ?? '',
             'password' => $payload['password'],
-            'status' => $payload['status'],
-            'role' => $payload['role'],
         ]);
 
         return $this->db->insertId();
