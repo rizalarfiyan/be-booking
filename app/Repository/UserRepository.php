@@ -68,7 +68,7 @@ class UserRepository extends BaseRepository
             'book_count',
             'created_at',
             'updated_at',
-        ], $payload['orderType']) ?? 'created_at';
+        ], $payload['orderBy']) ?? 'created_at';
         $orderType = columnValidation(['ASC', 'DESC'], $payload['orderType']) ?? 'ASC';
 
         return $this->db->query('SELECT user_id, first_name, last_name, email, status, role, points, book_count, created_at, updated_at FROM users WHERE %l ORDER BY %l %l LIMIT %d OFFSET %d', $condition, $orderBy, $orderType, $payload['count'], $payload['page'] * $payload['count']);

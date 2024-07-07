@@ -357,7 +357,7 @@ class BookRepository extends BaseRepository
         $condition = $this->baseGetAll($payload);
         $orderBy = columnValidation([
             'created_at',
-        ], $payload['orderType']) ?? 'created_at';
+        ], $payload['orderBy']) ?? 'created_at';
         $orderType = columnValidation(['ASC', 'DESC'], $payload['orderType']) ?? 'ASC';
 
         return $this->db->query('SELECT book_id, title, slug, image, rating, stock, borrowed, published_at, created_at, deleted_at FROM books b WHERE %l ORDER BY %l %l LIMIT %d OFFSET %d', $condition, $orderBy, $orderType, $payload['count'], $payload['page'] * $payload['count']);

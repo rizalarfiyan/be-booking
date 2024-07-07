@@ -38,8 +38,31 @@ class HistoryRepository extends BaseRepository
         $condition = $this->baseGetAll($payload);
         $orderBy = columnValidation([
             'created_at',
-        ], $payload['orderType']) ?? 'h.created_at';
-        $orderType = columnValidation(['ASC', 'DESC'], $payload['orderType']) ?? 'ASC';
+            'history_id',
+            'user_id',
+            'title',
+            'status',
+            'point',
+            'created_at',
+            'return_at',
+            'borrow_at',
+            'returned_at',
+        ], $payload['orderBy']) ?? 'created_at';
+
+        $mappingOrderBy = [
+            'history_id' => 'h.history_id',
+            'user_id' => 'h.user_id',
+            'title' => 'b.title',
+            'status' => 'h.status',
+            'point' => 'h.point',
+            'created_at' => 'h.created_at',
+            'return_at' => 'h.return_at',
+            'borrow_at' => 'h.borrow_at',
+            'returned_at' => 'h.returned_at',
+        ];
+
+        $orderBy = $mappingOrderBy[$orderBy];
+        $orderType = columnValidation(['ASC', 'DESC'], $payload['orderType']) ?? 'DESC';
         return $this->db->query('SELECT h.history_id, h.user_id, b.title, h.status, h.point, h.created_at, h.return_at, h.borrow_at, h.returned_at FROM histories h JOIN books b USING (book_id) WHERE %l ORDER BY %l %l LIMIT %d OFFSET %d', $condition, $orderBy, $orderType, $payload['count'], $payload['page'] * $payload['count']);
     }
 
