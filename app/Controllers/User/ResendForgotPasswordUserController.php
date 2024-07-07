@@ -9,7 +9,7 @@ use Booking\Message\StatusCodeInterface as StatusCode;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class ResendActivationUserController extends BaseUserController
+class ResendForgotPasswordUserController extends BaseUserController
 {
     /**
      * @param int $id
@@ -19,8 +19,8 @@ class ResendActivationUserController extends BaseUserController
      */
     public function __invoke(int $id, ServerRequestInterface $req): ResponseInterface
     {
-        $this->user->resendVerification($id);
+        $this->user->resendForgotPassword($id);
 
-        return $this->sendJson(null, StatusCode::STATUS_OK, 'Resend email verification to user successfully.');
+        return $this->sendJson(null, StatusCode::STATUS_OK, 'Resend email forgot password to user successfully.');
     }
 }

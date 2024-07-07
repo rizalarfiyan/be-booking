@@ -46,7 +46,7 @@ class UserService
     public static function response($user, bool $isDetail = false): array
     {
         $data = [
-            'userId' => (int)$user['user_id'],
+            'userId' => (int) $user['user_id'],
             'firstName' => $user['first_name'],
             'lastName' => $user['last_name'],
             'email' => $user['email'],
@@ -55,11 +55,11 @@ class UserService
         ];
 
         if ($isDetail) {
-            $data['points'] = (int)$user['points'];
-            $data['bookCount'] = (int)$user['book_count'];
+            $data['points'] = (int) $user['points'];
+            $data['bookCount'] = (int) $user['book_count'];
         }
 
-        if (!$isDetail) {
+        if (! $isDetail) {
             $data['createdAt'] = $user['created_at'];
             $data['updatedAt'] = $user['updated_at'];
         }
@@ -75,7 +75,7 @@ class UserService
     {
         try {
             return [
-                'content' => collect($this->user->getAll($payload))->map(fn($user) => self::response($user, true)),
+                'content' => collect($this->user->getAll($payload))->map(fn ($user) => self::response($user, true)),
                 'total' => $this->user->countAll($payload),
             ];
         } catch (Throwable $e) {
@@ -100,7 +100,7 @@ class UserService
             throw new UnprocessableEntitiesException('Failed to get user. Please check your input.');
         }
 
-        if (!$data) {
+        if (! $data) {
             throw new NotFoundException('User could not be found, please try again later.');
         }
 
@@ -146,7 +146,7 @@ class UserService
         }
 
         try {
-            if (!$hasSendEmail) return;
+            if (! $hasSendEmail) return;
             AuthService::sendVerification($payload, $code);
         } catch (PHPMailerException $e) {
             errorLog($e);
@@ -162,7 +162,7 @@ class UserService
     {
         try {
             $data = $this->user->getById($payload['userId']);
-            if (!$data) {
+            if (! $data) {
                 throw new NotFoundException('User could not be found, please try again later.');
             }
 
@@ -188,7 +188,7 @@ class UserService
     {
         try {
             $user = $this->user->getById($id);
-            if (!$user) {
+            if (! $user) {
                 throw new NotFoundException('User could not be found!');
             }
 
@@ -225,6 +225,49 @@ class UserService
 
         try {
             AuthService::sendVerification($payload, $code);
+        } catch (PHPMailerException $e) {
+            errorLog($e);
+            throw new UnprocessableEntitiesException('Could not be sent email, please contact administrator.');
+        }
+    }
+
+    /**
+     * @param int $id
+     * @return void
+     * @throws UnprocessableEntitiesException
+     */
+    public function resendForgotPassword(int $id): void {
+        try {
+            $user = $this->user->getById($id);
+            if (! $user) {
+                throw new NotFoundException('User could not be found!');
+            }
+
+            $this->repo->startTransaction();
+            $code = randomStr();
+            $verification = [
+                'userId' => $id,
+                'type' => Constants::TYPE_VERIFICATION_FORGOT_PASSWORD,
+                'code' => $code,
+                'expiredAt' => datetime()->addHours(1)->format('Y-m-d H:i:s'),
+            ];
+            $this->verification->deleteByTypeAndUser(Constants::TYPE_VERIFICATION_FORGOT_PASSWORD, $id);
+            $this->verification->insert($verification);
+
+            $this->repo->commit();
+        } catch (Throwable $e) {
+            if ($e instanceof NotFoundException) {
+                throw $e;
+            }
+
+            errorLog($e);
+            $this->repo->rollback();
+
+            throw new UnprocessableEntitiesException('User could not be resend forgot password, please try again later.');
+        }
+
+        try {
+            AuthService::sendForgotPassword($user, $code);
         } catch (PHPMailerException $e) {
             errorLog($e);
             throw new UnprocessableEntitiesException('Could not be sent email, please contact administrator.');

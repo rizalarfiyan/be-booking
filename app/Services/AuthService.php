@@ -377,25 +377,33 @@ class AuthService
         $this->verification->insert($verification);
 
         try {
-            $fullName = fullName($user['first_name'], $user['last_name']);
-            $url = config('url.change_password').'?code='.$code;
-
-            $mailer = new Mailer();
-            $mail = $mailer->getMail();
-            $mail->addAddress($email, $fullName);
-            $mail->isHTML();
-            $mail->Subject = 'Reset Password';
-            $mail->Body = $mailer->getTemplate('reset_password', [
-                'name' => $fullName,
-                'url' => $url,
-                'image' => config('url.fe').'/images/email/reset_password.png',
-            ]);
-            $mail->AltBody = "Hi $fullName, Please reset your password by clicking the link below: $url";
-            $mail->send();
+            self::sendForgotPassword($user, $code);
         } catch (Exception $e) {
             errorLog($e);
             throw new UnprocessableEntitiesException('Could not be sent email, please contact administrator.');
         }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public static function sendForgotPassword($user, $code): void
+    {
+        $fullName = fullName($user['first_name'], $user['last_name']);
+        $url = config('url.change_password').'?code='.$code;
+
+        $mailer = new Mailer();
+        $mail = $mailer->getMail();
+        $mail->addAddress($user['email'], $fullName);
+        $mail->isHTML();
+        $mail->Subject = 'Reset Password';
+        $mail->Body = $mailer->getTemplate('reset_password', [
+            'name' => $fullName,
+            'url' => $url,
+            'image' => config('url.fe').'/images/email/reset_password.png',
+        ]);
+        $mail->AltBody = "Hi $fullName, Please reset your password by clicking the link below: $url";
+        $mail->send();
     }
 
     /**

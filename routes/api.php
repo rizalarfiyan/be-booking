@@ -61,6 +61,7 @@ $router->group('/api/v1/', function ($router) {
 
         $router->group('/resend', function ($router) use ($auth, $admin) {
             $router->post('/activation/{id:\d+}', App\Controllers\User\ResendActivationUserController::class, [$auth, $admin]);
+            $router->post('/forgot-password/{id:\d+}', App\Controllers\User\ResendForgotPasswordUserController::class, [$auth, $admin]);
         });
     });
 });
