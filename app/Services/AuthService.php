@@ -288,7 +288,7 @@ class AuthService
     {
         $user = $this->user->getByEmail($data['email']);
 
-        if (! $user || ! self::checkPassword($data['password'], $user['password'])) {
+        if (! $user || ! self::checkPassword($data['password'], $user['password']) || $user['status'] === Constants::TYPE_USER_BANNED) {
             throw new BadRequestException(CoreConstants::VALIDATION_MESSAGE, [
                 'email' => 'Email or password is incorrect.',
             ]);

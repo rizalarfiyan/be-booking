@@ -1,17 +1,17 @@
 -- Migrate to Version 0
 CREATE TABLE users
 (
-    user_id    INT PRIMARY KEY             NOT NULL AUTO_INCREMENT,
-    first_name VARCHAR(50)                 NOT NULL,
-    last_name  VARCHAR(50)                 NOT NULL DEFAULT '',
+    user_id    INT PRIMARY KEY                       NOT NULL AUTO_INCREMENT,
+    first_name VARCHAR(50)                           NOT NULL,
+    last_name  VARCHAR(50)                           NOT NULL DEFAULT '',
     email      VARCHAR(100) UNIQUE,
-    password   VARCHAR(100)                NOT NULL,
+    password   VARCHAR(100)                          NOT NULL,
     status     ENUM ('active', 'inactive', 'banned') NOT NULL DEFAULT 'inactive',
-    role       ENUM ('admin', 'reader')     NOT NULL DEFAULT 'reader',
-    points     INT                         NOT NULL DEFAULT 0,
-    book_count INT                         NOT NULL DEFAULT 0,
-    created_at DATETIME                    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME                    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    role       ENUM ('admin', 'reader')              NOT NULL DEFAULT 'reader',
+    points     INT                                   NOT NULL DEFAULT 0,
+    book_count INT                                   NOT NULL DEFAULT 0,
+    created_at DATETIME                              NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME                              NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE verifications
