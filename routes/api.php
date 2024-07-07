@@ -67,9 +67,9 @@ $router->group('/api/v1/', function ($router) {
     
     $router->group('/history', function ($router) use ($auth, $admin) {
         $router->get('/', App\Controllers\History\AllHistoryController::class, [$auth]);
-        // $router->post('/', App\Controllers\Category\CreateCategoryController::class, [$auth, $admin]);
-        // $router->get('/{id:\d+}', App\Controllers\Category\DetailCategoryController::class, [$auth, $admin]);
-        // $router->put('/{id:\d+}', App\Controllers\Category\UpdateCategoryController::class, [$auth, $admin]);
-        // $router->delete('/{id:\d+}', App\Controllers\Category\DeleteCategoryController::class, [$auth, $admin]);
+        $router->post('/', App\Controllers\History\CreateHistoryController::class, [$auth]);
+        $router->post('/cancel', App\Controllers\History\CancelHistoryController::class, [$auth]);
+        $router->post('/read', App\Controllers\History\ReadHistoryController::class, [$auth, $admin]);
+        $router->post('/return', App\Controllers\History\ReturnHistoryController::class, [$auth, $admin]);
     });
 });

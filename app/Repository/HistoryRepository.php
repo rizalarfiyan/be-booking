@@ -22,7 +22,7 @@ class HistoryRepository extends BaseRepository
             $where->add('b.title like %s', "%{$payload['search']}%");
         }
 
-        if (! empty($payload['userId'])) {
+        if (! empty($payload['userId']) && !$payload['isAdmin']) {
             $where->add('h.user_id = %d', $payload['userId']);
         }
 
@@ -66,9 +66,86 @@ class HistoryRepository extends BaseRepository
             'user_id' => $payload['userId'],
             'book_id' => $payload['bookId'],
             'borrow_by' => $payload['borrowBy'],
+            'borrow_at' => datetime(),
             'created_by' => $payload['createdBy'],
         ]);
 
         return $this->db->insertId();
+    }
+
+    /**
+     *
+     * @param $payload
+     * @return int
+     * @throws MeekroDBException
+     */
+    public function cancel($payload): int
+    {
+        $this->db->update('histories', [
+            'status' => 'cancel',
+        ], 'history_id = %d', $payload['historyId']);
+
+        return $this->db->affectedRows();
+    }
+
+    /**
+     *
+     * @param $payload
+     * @return int
+     * @throws MeekroDBException
+     */
+    public function read($payload): int
+    {
+        $this->db->update('histories', [
+            'status' => 'read',
+            'return_at' => datetime()->addDays(7),
+        ], 'history_id = %d', $payload['historyId']);
+
+        return $this->db->affectedRows();
+    }
+
+    /**
+     * Get category by id.
+     *
+     * @param int $id
+     * @return mixed
+     */
+    public function getBorrowTime(int $id): mixed
+    {
+        return $this->db->queryFirstRow('SELECT borrow_at FROM histories where history_id = %d', $id);
+    }
+
+    /**
+     *
+     * @param $payload
+     * @return int
+     * @throws MeekroDBException
+     */
+    public function return($payload): int
+    {
+        $this->db->update('histories', [
+            'status' => 'read',
+            'return_at' => datetime()->addDays(7),
+        ], 'history_id = %d', $payload['historyId']);
+
+        return $this->db->affectedRows();
+    }
+
+    /**
+     *
+     * @param $payload
+     * @return int
+     * @throws MeekroDBException
+     */
+    public function returned($payload): int
+    {
+        $this->db->update('histories', [
+            'status' => 'success',
+            'point' => $payload['point'],
+            'returned_at' => datetime(),
+            'returned_by' => $payload['returnedBy'],
+        ], 'history_id = %d', $payload['historyId']);
+
+        return $this->db->affectedRows();
     }
 }

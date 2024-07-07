@@ -89,4 +89,74 @@ class HistoryService
             throw new UnprocessableEntitiesException('Cannot borrow the book, please try again later.');
         }
     }
+
+
+    /**
+     * Borrow the book.
+     *
+     * @param $payload
+     * @return void
+     * @throws UnprocessableEntitiesException
+     */
+    public function cancel($payload): void
+    {
+        try {
+            $this->history->cancel($payload);
+        } catch (Throwable $e) {
+            errorLog($e);
+
+            if ($e->getCode() === 1644) {
+                throw new UnprocessableEntitiesException($e->getMessage());
+            }
+
+            throw new UnprocessableEntitiesException('Cannot change status to cancel, please try again later.');
+        }
+    }
+
+
+    /**
+     * Borrow the book.
+     *
+     * @param $payload
+     * @return void
+     * @throws UnprocessableEntitiesException
+     */
+    public function read($payload): void
+    {
+        try {
+            $this->history->read($payload);
+        } catch (Throwable $e) {
+            errorLog($e);
+
+            if ($e->getCode() === 1644) {
+                throw new UnprocessableEntitiesException($e->getMessage());
+            }
+
+            throw new UnprocessableEntitiesException('Cannot change status to read, please try again later.');
+        }
+    }
+
+    /**
+     * Borrow the book.
+     *
+     * @param $payload
+     * @return void
+     * @throws UnprocessableEntitiesException
+     */
+    public function return($payload): void
+    {
+        try {
+            $borrowAt = $this->history->getBorrowTime($payload['historyId']);
+            $payload['point'] = !$borrowAt ? 1 : (datetime($borrowAt['borrow_at'])->diffInDays(datetime()) + 1) * 2;
+            $this->history->returned($payload);
+        } catch (Throwable $e) {
+            errorLog($e);
+
+            if ($e->getCode() === 1644) {
+                throw new UnprocessableEntitiesException($e->getMessage());
+            }
+
+            throw new UnprocessableEntitiesException('Cannot change status to return, please try again later.');
+        }
+    }
 }
