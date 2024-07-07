@@ -274,9 +274,14 @@ class BookService
      * @param Throwable $t
      * @return void
      * @throws BadRequestException
+     * @throws NotFoundException|Throwable
      */
     protected function createEditError(Throwable $t): void
     {
+        if ($t instanceof NotFoundException) {
+            throw $t;
+        }
+
         if ($t->getCode() === 1062) {
             $message = $t->getMessage();
             $error = [];

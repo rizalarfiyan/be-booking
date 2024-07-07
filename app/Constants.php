@@ -14,6 +14,8 @@ interface Constants
 
     public const TYPE_USER_INACTIVE = 'inactive';
 
+    public const TYPE_USER_BANNED = 'banned';
+
     public const ROLE_ADMIN = 'admin';
 
     public const ROLE_READER = 'reader';
