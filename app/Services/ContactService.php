@@ -102,11 +102,11 @@ class ContactService
             $data = $this->contact->getById($id);
         } catch (Throwable $t) {
             errorLog($t);
-            throw new NotFoundException('Failed to get all contacts.');
+            throw new UnprocessableEntitiesException('Failed to get all contacts.');
         }
 
         if (! $data) {
-            throw new UnprocessableEntitiesException('Contact not found.');
+            throw new NotFoundException('Contact not found.');
         }
 
         return self::response($data, true);

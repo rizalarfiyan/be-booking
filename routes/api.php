@@ -58,5 +58,9 @@ $router->group('/api/v1/', function ($router) {
         $router->post('/', App\Controllers\User\CreateUserController::class, [$auth, $admin]);
         $router->get('/{id:\d+}', App\Controllers\User\GetByIdUserController::class, [$auth, $admin]);
         $router->put('/{id:\d+}', App\Controllers\User\UpdateUserController::class, [$auth, $admin]);
+
+        $router->group('/resend', function ($router) use ($auth, $admin) {
+            $router->post('/activation/{id:\d+}', App\Controllers\User\ResendActivationUserController::class, [$auth, $admin]);
+        });
     });
 });
