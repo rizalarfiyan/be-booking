@@ -41,7 +41,7 @@ class CategoryRepository extends BaseRepository
             'updated_by',
             'deleted_at',
             'deleted_by',
-        ], $payload['orderType']) ?? 'created_at';
+        ], $payload['orderBy']) ?? 'created_at';
         $orderType = columnValidation(['ASC', 'DESC'], $payload['orderType']) ?? 'ASC';
 
         return $this->db->query('SELECT category_id, name, slug, created_at, deleted_at FROM categories WHERE %l ORDER BY %l %l LIMIT %d OFFSET %d', $condition, $orderBy, $orderType, $payload['count'], $payload['page'] * $payload['count']);

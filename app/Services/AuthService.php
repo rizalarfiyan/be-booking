@@ -117,7 +117,7 @@ class AuthService
     public static function getAuthToken(ServerRequestInterface $request): Token
     {
         $authorization = $request->getHeaderLine('Authorization');
-        if (! $authorization) {
+        if (!$authorization) {
             throw new UnauthorizedException('Token not present');
         }
 
@@ -145,6 +145,21 @@ class AuthService
         $token = self::getAuthToken($request);
 
         return $token->claims()->get('id');
+    }
+
+
+    /**
+     * @param ServerRequestInterface $request
+     * @return ?int
+     */
+    public static function getUserIdFromTokenIfAvailable(ServerRequestInterface $request): ?int
+    {
+        try {
+            $token = self::getAuthToken($request);
+            return $token->claims()->get('id');
+        } catch (Throwable) {
+            return null;
+        }
     }
 
     /**
@@ -186,7 +201,7 @@ class AuthService
             throw new UnauthorizedException('Invalid token');
         }
 
-        if (! $token->isIdentifiedBy($conf['jti']) || ! $token->hasBeenIssuedBy($issuedBy)) {
+        if (!$token->isIdentifiedBy($conf['jti']) || !$token->hasBeenIssuedBy($issuedBy)) {
             throw new UnauthorizedException('Token not mismatched');
         }
 
@@ -202,14 +217,14 @@ class AuthService
     public static function userResponse($user): array
     {
         return [
-            'userId' => (int) $user['user_id'],
+            'userId' => (int)$user['user_id'],
             'firstName' => $user['first_name'],
             'lastName' => $user['last_name'] ?? '',
             'email' => $user['email'],
             'role' => $user['role'],
             'avatar' => '',
-            'points' => (int) $user['points'],
-            'bookCount' => (int) $user['book_count'],
+            'points' => (int)$user['points'],
+            'bookCount' => (int)$user['book_count'],
         ];
     }
 
@@ -298,7 +313,7 @@ class AuthService
             throw new UnprocessableEntitiesException('Email is not verified. Please check your email and verify.');
         }
 
-        $token = self::generateToken((int) $user['user_id'], $user['role'], $data['isRemember']);
+        $token = self::generateToken((int)$user['user_id'], $user['role'], $data['isRemember']);
 
         return [
             'token' => $token,
@@ -326,7 +341,7 @@ class AuthService
      */
     protected function isNotValidVerification($data, string $type): bool
     {
-        return ! $data || $data['type'] !== $type || datetime($data['expired_at'])->isPast();
+        return !$data || $data['type'] !== $type || datetime($data['expired_at'])->isPast();
     }
 
     /**
@@ -343,7 +358,7 @@ class AuthService
         }
 
         try {
-            $userId = (int) $data['user_id'];
+            $userId = (int)$data['user_id'];
             $this->repo->startTransaction();
             $this->user->updateStatus(Constants::TYPE_USER_ACTIVE, $userId);
             $this->verification->deleteByTypeAndUser(Constants::TYPE_VERIFICATION_ACTIVATION, $userId);
@@ -363,13 +378,13 @@ class AuthService
     public function forgotPassword(string $email): void
     {
         $user = $this->user->getByEmail($email);
-        if (! $user) {
+        if (!$user) {
             return;
         }
 
         $code = randomStr();
         $verification = [
-            'userId' => (int) $user['user_id'],
+            'userId' => (int)$user['user_id'],
             'type' => Constants::TYPE_VERIFICATION_FORGOT_PASSWORD,
             'code' => $code,
             'expiredAt' => datetime()->addHours(1)->format('Y-m-d H:i:s'),
@@ -422,7 +437,7 @@ class AuthService
         }
 
         try {
-            $userId = (int) $data['user_id'];
+            $userId = (int)$data['user_id'];
             $this->repo->startTransaction();
             $this->user->updatePassword(self::hashPassword($password), $userId);
             $this->verification->deleteByTypeAndUser(Constants::TYPE_VERIFICATION_FORGOT_PASSWORD, $userId);

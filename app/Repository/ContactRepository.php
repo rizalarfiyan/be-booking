@@ -61,7 +61,7 @@ class ContactRepository extends BaseRepository
             'is_read',
             'created_at',
             'updated_at',
-        ], $payload['orderType']) ?? 'created_at';
+        ], $payload['orderBy']) ?? 'created_at';
         $orderType = columnValidation(['ASC', 'DESC'], $payload['orderType']) ?? 'ASC';
 
         return $this->db->query('SELECT contact_id, first_name, last_name, email, phone, created_at FROM contacts WHERE %l ORDER BY %l %l LIMIT %d OFFSET %d', $condition, $orderBy, $orderType, $payload['count'], $payload['page'] * $payload['count']);

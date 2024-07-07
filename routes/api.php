@@ -19,9 +19,9 @@ $router->group('/api/v1/', function ($router) {
         $router->get('/me', App\Controllers\Auth\MeAuthController::class, [$auth]);
     });
 
-    $router->group('/contact', function ($router) use ($auth) {
-        $router->get('/', App\Controllers\Contact\AllContactController::class, [$auth]);
-        $router->get('/{id:\d+}', App\Controllers\Contact\DetailContactController::class, [$auth]);
+    $router->group('/contact', function ($router) use ($auth, $admin) {
+        $router->get('/', App\Controllers\Contact\AllContactController::class, [$auth, $admin]);
+        $router->get('/{id:\d+}', App\Controllers\Contact\DetailContactController::class, [$auth, $admin]);
         $router->post('/', App\Controllers\Contact\CreateContactController::class);
     });
 
@@ -62,6 +62,19 @@ $router->group('/api/v1/', function ($router) {
         $router->group('/resend', function ($router) use ($auth, $admin) {
             $router->post('/activation/{id:\d+}', App\Controllers\User\ResendActivationUserController::class, [$auth, $admin]);
             $router->post('/forgot-password/{id:\d+}', App\Controllers\User\ResendForgotPasswordUserController::class, [$auth, $admin]);
+        });
+    });
+
+    $router->group('/history', function ($router) use ($auth, $admin) {
+        $router->get('/', App\Controllers\History\AllHistoryController::class, [$auth]);
+        $router->post('/', App\Controllers\History\CreateHistoryController::class, [$auth]);
+        $router->post('/cancel', App\Controllers\History\CancelHistoryController::class, [$auth]);
+        $router->post('/read', App\Controllers\History\ReadHistoryController::class, [$auth, $admin]);
+        $router->post('/return', App\Controllers\History\ReturnHistoryController::class, [$auth, $admin]);
+
+        $router->group('/review', function ($router) use ($auth) {
+            $router->get('/{id:\d+}', App\Controllers\History\ReviewHistoryController::class, [$auth]);
+            $router->post('/{id:\d+}', App\Controllers\History\CreateReviewHistoryController::class, [$auth]);
         });
     });
 });

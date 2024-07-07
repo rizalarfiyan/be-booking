@@ -166,6 +166,19 @@ class BookRepository extends BaseRepository
     }
 
     /**
+     * Check user has borrow the book or not
+     *
+     * @param int $id
+     * @param int|null $userId
+     * @return mixed
+     */
+    public function hasBorrow(int $id, ?int $userId): mixed
+    {
+        $query = "SELECT COUNT(history_id) > 0 AS result FROM histories WHERE book_id = %d AND user_id = %d AND status IN ('pending', 'read')";
+        return $this->db->queryFirstField($query, $id, $userId);
+    }
+
+    /**
      * Get book category by book id.
      *
      * @param int $id
@@ -344,7 +357,7 @@ class BookRepository extends BaseRepository
         $condition = $this->baseGetAll($payload);
         $orderBy = columnValidation([
             'created_at',
-        ], $payload['orderType']) ?? 'created_at';
+        ], $payload['orderBy']) ?? 'created_at';
         $orderType = columnValidation(['ASC', 'DESC'], $payload['orderType']) ?? 'ASC';
 
         return $this->db->query('SELECT book_id, title, slug, image, rating, stock, borrowed, published_at, created_at, deleted_at FROM books b WHERE %l ORDER BY %l %l LIMIT %d OFFSET %d', $condition, $orderBy, $orderType, $payload['count'], $payload['page'] * $payload['count']);

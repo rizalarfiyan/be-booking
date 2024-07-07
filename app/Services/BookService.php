@@ -223,16 +223,16 @@ class BookService
     }
 
     /**
-     * Get category by id.
-     *
      * @param int $id
+     * @param int|null $userId
      * @return array
      * @throws UnprocessableEntitiesException
      */
-    public function getStock(int $id): array
+    public function getStock(int $id, ?int $userId): array
     {
         try {
             $data = $this->book->getStock($id);
+            $hasBorrow = $userId && $this->book->hasBorrow($id, $userId);
         } catch (Throwable $t) {
             errorLog($t);
             throw new UnprocessableEntitiesException('Failed to get stock book.');
@@ -241,6 +241,7 @@ class BookService
         return [
             'stock' => (int) $data['stock'],
             'borrowed' => (int) $data['borrowed'],
+            'hasBorrow' => $hasBorrow,
         ];
     }
 
