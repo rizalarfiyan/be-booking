@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Constants;
 use App\Repository\UserRepository;
+use App\Repository\VerificationRepository;
 use Booking\Constants as CoreConstants;
 use Booking\Exception\BadRequestException;
 use Booking\Exception\NotFoundException;
 use Booking\Exception\UnprocessableEntitiesException;
 use Booking\Repository\BaseRepository;
+use Lcobucci\JWT\Exception;
 use MeekroDB;
+use PHPMailer\PHPMailer\Exception as PHPMailerException;
 use Throwable;
 
 class UserService
@@ -21,6 +25,9 @@ class UserService
     /** @var UserRepository */
     protected UserRepository $user;
 
+    /** @var VerificationRepository */
+    protected VerificationRepository $verification;
+
     /**
      * @param BaseRepository $repo
      */
@@ -28,9 +35,8 @@ class UserService
     {
         $this->repo = $repo->db();
         $this->user = new UserRepository($this->repo);
+        $this->verification = new VerificationRepository($this->repo);
     }
-
-    // response
 
     /**
      * @param $user
@@ -39,11 +45,6 @@ class UserService
      */
     public static function response($user, bool $isDetail = false): array
     {
-
-
-        // get all
-        // semua kecuali password, created_at, updated_at
-
         $data = [
             'userId' => (int) $user['user_id'],
             'firstName' => $user['first_name'],
@@ -67,17 +68,11 @@ class UserService
 
     }
 
-    // get all users with pagination
-
     /**
      * @throws UnprocessableEntitiesException
      */
     public function getAll($payload): array
     {
-        // get all
-        // semua kecuali password, created_at, updated_at
-        // return data, total data, total page, current page
-
         try {
             return [
                 'content' => collect($this->user->getAll($payload))->map(fn ($user) => self::response($user, true)),
@@ -91,16 +86,12 @@ class UserService
 
     }
 
-    // get user by id
-
     /**
      * @throws UnprocessableEntitiesException
      * @throws NotFoundException
      */
-    public function getById(int $userId): mixed
+    public function getById(int $userId): array
     {
-        // by id
-        // return semua kecuali password, book_count, points
         try {
             $data = $this->user->getById($userId);
         } catch (Throwable $e) {
@@ -113,24 +104,36 @@ class UserService
             throw new NotFoundException('User could not be found, please try again later.');
         }
 
-        return self::response($data, false);
+        return self::response($data);
     }
 
-    // Create a new user
     /**
      * @throws UnprocessableEntitiesException
      * @throws BadRequestException
      */
     public function create($payload): void
     {
-
-        // create user
-        // payload =  email, password, first_name, last_name, status, role
-        // return = success message
+        $payload['password'] = AuthService::hashPassword($payload['password']);
 
         try {
-            $this->user->insert($payload);
+            $this->repo->startTransaction();
+            $userId = $this->user->insertNewUser($payload);
+            $hasSendEmail = $payload['status'] !== 'active';
+            $code = randomStr();
+
+            if ($hasSendEmail) {
+                $verification = [
+                    'userId' => $userId,
+                    'type' => Constants::TYPE_VERIFICATION_ACTIVATION,
+                    'code' => $code,
+                    'expiredAt' => datetime()->addHours(1)->format('Y-m-d H:i:s'),
+                ];
+                $this->verification->insert($verification);
+            }
+
+            $this->repo->commit();
         } catch (Throwable $e) {
+            $this->repo->rollback();
             errorLog($e);
 
             if ($e->getCode() === 1062) {
@@ -142,30 +145,29 @@ class UserService
             throw new UnprocessableEntitiesException('User could not be created, please try again later.');
         }
 
+        try {
+            if (! $hasSendEmail) return;
+            AuthService::sendVerification($payload, $code);
+        } catch (PHPMailerException $e) {
+            errorLog($e);
+            throw new UnprocessableEntitiesException('Could not be sent email, please contact administrator.');
+        }
     }
-
-    // Update user status
 
     /**
      * @param $payload
      * @throws UnprocessableEntitiesException
-     * @throws NotFoundException
      */
     public function update($payload): void
     {
-        // update user
-        // success message
-        // payload user_id, email, password, first_name, last_name, status, role
-
         try {
             $data = $this->user->getById($payload['userId']);
             if (! $data) {
                 throw new NotFoundException('User could not be found, please try again later.');
             }
-            $payload['password'] = $payload['password'] ?? $data['password'];
+
+            $payload['password'] = isset($payload['password']) ? AuthService::hashPassword($payload['password']) : $data['password'];
             $this->user->updateUserDetails($payload);
-
-
         } catch (Throwable $e) {
             errorLog($e);
 

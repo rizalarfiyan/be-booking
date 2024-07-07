@@ -249,25 +249,33 @@ class AuthService
         }
 
         try {
-            $fullName = fullName($data['firstName'], $data['lastName']);
-            $url = config('url.activation').'?code='.$code;
-
-            $mailer = new Mailer();
-            $mail = $mailer->getMail();
-            $mail->addAddress($data['email'], $fullName);
-            $mail->isHTML();
-            $mail->Subject = 'Email Verification';
-            $mail->Body = $mailer->getTemplate('verification', [
-                'name' => $fullName,
-                'url' => $url,
-                'image' => config('url.fe').'/images/email/verification.png',
-            ]);
-            $mail->AltBody = "Hi $fullName, Please verify your email by clicking the link below: $url";
-            $mail->send();
+            self::sendVerification($data, $code);
         } catch (Exception $e) {
             errorLog($e);
             throw new UnprocessableEntitiesException('Could not be sent email, please contact administrator.');
         }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public static function sendVerification($payload, $code): void
+    {
+        $fullName = fullName($payload['firstName'], $payload['lastName']);
+        $url = config('url.activation').'?code='.$code;
+
+        $mailer = new Mailer();
+        $mail = $mailer->getMail();
+        $mail->addAddress($payload['email'], $fullName);
+        $mail->isHTML();
+        $mail->Subject = 'Email Verification';
+        $mail->Body = $mailer->getTemplate('verification', [
+            'name' => $fullName,
+            'url' => $url,
+            'image' => config('url.fe').'/images/email/verification.png',
+        ]);
+        $mail->AltBody = "Hi $fullName, Please verify your email by clicking the link below: $url";
+        $mail->send();
     }
 
     /**

@@ -19,7 +19,7 @@ class UserRepository extends BaseRepository
      */
     public function getById(int $id): mixed
     {
-        return $this->db->queryFirstRow('SELECT user_id, first_name, last_name, email, password, status, role, points, book_count FROM users where user_id = %d', $id);
+        return $this->db->queryFirstRow('SELECT user_id, first_name, last_name, email, password, status, role, points, book_count, created_at, updated_at FROM users WHERE user_id = %d', $id);
     }
 
     /**
@@ -30,7 +30,7 @@ class UserRepository extends BaseRepository
      */
     public function getByEmail(string $email): mixed
     {
-        return $this->db->queryFirstRow('SELECT user_id, first_name, last_name, email, password, status, role, points, book_count FROM users where email = %s', $email);
+        return $this->db->queryFirstRow('SELECT user_id, first_name, last_name, email, password, status, role, points, book_count FROM users WHERE email = %s', $email);
     }
 
     /**
@@ -97,6 +97,28 @@ class UserRepository extends BaseRepository
             'first_name' => $payload['firstName'],
             'last_name' => $payload['lastName'] ?? '',
             'password' => $payload['password'],
+            'status' => $payload['status'],
+            'role' => $payload['role'],
+        ]);
+
+        return $this->db->insertId();
+    }
+
+    /**
+     * Insert user.
+     *
+     * @param $payload
+     * @return int return the id of the inserted user
+     */
+    public function insertNewUser($payload): int
+    {
+        $this->db->insert('users', [
+            'email' => $payload['email'],
+            'first_name' => $payload['firstName'],
+            'last_name' => $payload['lastName'] ?? '',
+            'password' => $payload['password'],
+            'status' => $payload['status'],
+            'role' => $payload['role'],
         ]);
 
         return $this->db->insertId();
@@ -154,7 +176,7 @@ class UserRepository extends BaseRepository
      *
      * @return mixed
      */
-    public function getTopLeaderboard() :mixed
+    public function getTopLeaderboard(): mixed
     {
         return $this->db->query('SELECT user_id, first_name, last_name, email, points, book_count FROM users ORDER BY points DESC, created_at LIMIT %d', Constants::LEADERBOARD_LIMIT);
     }
@@ -165,7 +187,7 @@ class UserRepository extends BaseRepository
      * @param int $userId
      * @return mixed
      */
-    public function getCurrentRank(int $userId):mixed
+    public function getCurrentRank(int $userId): mixed
     {
         $query = 'WITH user_ranks AS (
             SELECT user_id, points, ROW_NUMBER() OVER (ORDER BY points DESC, created_at) AS ranking FROM users LIMIT %d
