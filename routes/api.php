@@ -64,12 +64,17 @@ $router->group('/api/v1/', function ($router) {
             $router->post('/forgot-password/{id:\d+}', App\Controllers\User\ResendForgotPasswordUserController::class, [$auth, $admin]);
         });
     });
-    
+
     $router->group('/history', function ($router) use ($auth, $admin) {
         $router->get('/', App\Controllers\History\AllHistoryController::class, [$auth]);
         $router->post('/', App\Controllers\History\CreateHistoryController::class, [$auth]);
         $router->post('/cancel', App\Controllers\History\CancelHistoryController::class, [$auth]);
         $router->post('/read', App\Controllers\History\ReadHistoryController::class, [$auth, $admin]);
         $router->post('/return', App\Controllers\History\ReturnHistoryController::class, [$auth, $admin]);
+
+        $router->group('/review', function ($router) use ($auth) {
+            $router->get('/{id:\d+}', App\Controllers\History\ReviewHistoryController::class, [$auth]);
+            $router->post('/{id:\d+}', App\Controllers\History\CreateReviewHistoryController::class, [$auth]);
+        });
     });
 });

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Repository\HistoryRepository;
+use Booking\Exception\NotFoundException;
 use Booking\Exception\UnprocessableEntitiesException;
 use Booking\Repository\BaseRepository;
 use MeekroDB;
@@ -90,7 +91,6 @@ class HistoryService
         }
     }
 
-
     /**
      * Borrow the book.
      *
@@ -112,7 +112,6 @@ class HistoryService
             throw new UnprocessableEntitiesException('Cannot change status to cancel, please try again later.');
         }
     }
-
 
     /**
      * Borrow the book.
@@ -158,5 +157,57 @@ class HistoryService
 
             throw new UnprocessableEntitiesException('Cannot change status to return, please try again later.');
         }
+    }
+
+    /**
+     * Rating review.
+     *
+     * @param $payload
+     * @return void
+     * @throws UnprocessableEntitiesException
+     */
+    public function createReview($payload): void
+    {
+        try {
+            $this->history->review($payload);
+        } catch (Throwable $e) {
+            errorLog($e);
+
+            if ($e->getCode() === 1644) {
+                throw new UnprocessableEntitiesException($e->getMessage());
+            }
+
+            throw new UnprocessableEntitiesException('Cannot create a review, please try again later.');
+        }
+    }
+
+    /**
+     * Get rating history detail.
+     *
+     * @param int $id
+     * @return array
+     * @throws UnprocessableEntitiesException
+     * @throws NotFoundException
+     */
+    public function reviewHistory(int $id): array
+    {
+        try {
+            $data = $this->history->getReviewHistory($id);
+        } catch (Throwable $t) {
+            errorLog($t);
+            throw new UnprocessableEntitiesException('Failed to get review history.');
+        }
+
+        if (!$data) {
+            throw new NotFoundException('Review history not found.');
+        }
+
+        return [
+            'historyId' => (int) $data['history_id'],
+            'rating' => (int) $data['rating'],
+            'review' => (int) $data['review'],
+            'createdAt' => $data['created_at'],
+            'updatedAt' => $data['updated_at'],
+        ];
     }
 }

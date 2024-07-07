@@ -18,11 +18,11 @@ class HistoryRepository extends BaseRepository
     protected function baseGetAll($payload): WhereClause
     {
         $where = new WhereClause('or');
-        if (! empty($payload['search'])) {
+        if (!empty($payload['search'])) {
             $where->add('b.title like %s', "%{$payload['search']}%");
         }
 
-        if (! empty($payload['userId']) && !$payload['isAdmin']) {
+        if (!empty($payload['userId']) && !$payload['isAdmin']) {
             $where->add('h.user_id = %d', $payload['userId']);
         }
 
@@ -51,10 +51,10 @@ class HistoryRepository extends BaseRepository
     {
         $condition = $this->baseGetAll($payload);
 
-        return (int) $this->db->queryFirstField('SELECT count(history_id) FROM histories h JOIN books b USING (book_id) WHERE %l', $condition) ?? 0;
+        return (int)$this->db->queryFirstField('SELECT COUNT(history_id) FROM histories h JOIN books b USING (book_id) WHERE %l', $condition) ?? 0;
     }
 
-        /**
+    /**
      * Insert history.
      *
      * @param $payload
@@ -112,7 +112,7 @@ class HistoryRepository extends BaseRepository
      */
     public function getBorrowTime(int $id): mixed
     {
-        return $this->db->queryFirstRow('SELECT borrow_at FROM histories where history_id = %d', $id);
+        return $this->db->queryFirstRow('SELECT borrow_at FROM histories WHERE history_id = %d', $id);
     }
 
     /**
@@ -147,5 +147,26 @@ class HistoryRepository extends BaseRepository
         ], 'history_id = %d', $payload['historyId']);
 
         return $this->db->affectedRows();
+    }
+
+    /**
+     * Get rating history by id.
+     *
+     * @param int $id
+     * @return mixed
+     */
+    public function getReviewHistory(int $id): mixed
+    {
+        return $this->db->queryFirstRow('SELECT history_id, rating, review, created_at, updated_at FROM rating_histories WHERE history_id = %d', $id);
+    }
+
+    /**
+     *
+     * @param $payload
+     * @return void
+     */
+    public function review($payload): void
+    {
+        $this->db->query('INSERT INTO rating_histories (history_id, rating, review) VALUES (%d, %d, %s) ON DUPLICATE KEY UPDATE rating = %d, review = %s', $payload['historyId'], $payload['rating'], $payload['review'], $payload['rating'], $payload['review']);
     }
 }
