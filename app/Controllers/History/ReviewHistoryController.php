@@ -21,8 +21,8 @@ class ReviewHistoryController extends BaseHistoryController
      */
     public function __invoke(int $id, ServerRequestInterface $req): ResponseInterface
     {
-        $this->history->reviewHistory($id);
+        $data = $this->history->reviewHistory($id);
 
-        return $this->sendJson(null, StatusCode::STATUS_OK, 'Get review history detail successfully.');
+        return $this->sendJson($data, StatusCode::STATUS_OK, 'Get review history detail successfully.');
     }
 }

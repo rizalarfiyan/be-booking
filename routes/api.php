@@ -72,6 +72,8 @@ $router->group('/api/v1/', function ($router) {
         $router->post('/read', App\Controllers\History\ReadHistoryController::class, [$auth, $admin]);
         $router->post('/return', App\Controllers\History\ReturnHistoryController::class, [$auth, $admin]);
 
+        $router->get('/card', App\Controllers\History\CardInformationController::class, [$auth]);
+
         $router->group('/review', function ($router) use ($auth) {
             $router->get('/{id:\d+}', App\Controllers\History\ReviewHistoryController::class, [$auth]);
             $router->post('/{id:\d+}', App\Controllers\History\CreateReviewHistoryController::class, [$auth]);

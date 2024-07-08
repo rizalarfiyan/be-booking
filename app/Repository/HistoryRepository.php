@@ -192,4 +192,35 @@ class HistoryRepository extends BaseRepository
     {
         $this->db->query('INSERT INTO rating_histories (history_id, rating, review) VALUES (%d, %d, %s) ON DUPLICATE KEY UPDATE rating = %d, review = %s', $payload['historyId'], $payload['rating'], $payload['review'], $payload['rating'], $payload['review']);
     }
+
+    /**
+     * Get user point by id.
+     *
+     * @param int $id
+     * @return mixed
+     */
+    public function getUserPoint(int $id): mixed
+    {
+        return $this->db->queryFirstRow('SELECT points, book_count, created_at FROM users WHERE user_id = %d', $id);
+    }
+
+    /**
+     * @param int $id
+     * @return int
+     */
+    public function countActiveBorrow(int $id): int
+    {
+        return (int)$this->db->queryFirstField("SELECT count(history_id) as total FROM histories WHERE user_id = %s AND status IN ('pending', 'read')", $id) ?? 0;
+    }
+
+    /**
+     * Get nearest borrow book.
+     *
+     * @param int $id
+     * @return mixed
+     */
+    public function getNearestBorrowBook(int $id): mixed
+    {
+        return $this->db->queryFirstRow("SELECT b.title, h.return_at FROM histories h JOIN books b USING(book_id) WHERE h.user_id = %d AND h.status = 'read' AND h.returned_at IS NULL ORDER BY h.return_at LIMIT 1", $id);
+    }
 }

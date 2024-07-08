@@ -213,7 +213,7 @@ class BookService
     public function getRecommendation(int $id): array
     {
         try {
-            $data = $this->book->getRecommendationByBookId($id, 6);
+            $data = $this->book->getRecommendationByBookId($id, 5);
         } catch (Throwable $t) {
             errorLog($t);
             throw new UnprocessableEntitiesException('Failed to get book recommendation.');
