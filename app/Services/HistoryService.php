@@ -203,11 +203,44 @@ class HistoryService
         }
 
         return [
-            'historyId' => (int) $data['history_id'],
-            'rating' => (int) $data['rating'],
-            'review' => (int) $data['review'],
+            'historyId' => (int)$data['history_id'],
+            'rating' => (int)$data['rating'],
+            'review' => $data['review'],
             'createdAt' => $data['created_at'],
             'updatedAt' => $data['updated_at'],
         ];
+    }
+
+    /**
+     * Get all categories.
+     *
+     * @param int $userId
+     * @return array
+     * @throws UnprocessableEntitiesException
+     */
+    public function getCardInformation(int $userId): array
+    {
+        try {
+            $data = $this->history->getUserPoint($userId);
+            $totalActive = $this->history->countActiveBorrow($userId);
+            $book = $this->history->getNearestBorrowBook($userId);
+
+            return [
+                'point' => (int)$data['points'],
+                'total' => (int)$data['book_count'],
+                'month' => datetime($data['created_at'])->diffInMonths(datetime()),
+                'borrow' => [
+                    'count' => $totalActive,
+                    'max' => 3,
+                ],
+                'nearest' => [
+                    'title' => $book['title'],
+                    'date' => $book['return_at'],
+                ],
+            ];
+        } catch (Throwable $t) {
+            errorLog($t);
+            throw new UnprocessableEntitiesException('Failed to get all history.');
+        }
     }
 }

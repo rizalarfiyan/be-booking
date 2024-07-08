@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Controllers\History;
+namespace App\Controllers\Book;
 
 use Booking\Exception\NotFoundException;
 use Booking\Exception\UnprocessableEntitiesException;
@@ -10,19 +10,15 @@ use Booking\Message\StatusCodeInterface as StatusCode;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class ReviewHistoryController extends BaseHistoryController
+class ReviewBookController extends BaseBookController
 {
     /**
-     * @param int $id
-     * @param ServerRequestInterface $req
-     * @return ResponseInterface
-     * @throws NotFoundException
      * @throws UnprocessableEntitiesException
      */
     public function __invoke(int $id, ServerRequestInterface $req): ResponseInterface
     {
-        $data = $this->history->reviewHistory($id);
+        $data = $this->book->getReview($id);
 
-        return $this->sendJson($data, StatusCode::STATUS_OK, 'Get review history detail successfully.');
+        return $this->sendJson($data, StatusCode::STATUS_OK, 'Get Book Review Successfully.');
     }
 }

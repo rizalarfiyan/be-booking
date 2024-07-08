@@ -217,6 +217,27 @@ class BookRepository extends BaseRepository
         return $this->db->query($query, $id, $id, $limit);
     }
 
+
+    /**
+     * Get book category by book id.
+     *
+     * @param int $id
+     * @param int $limit
+     * @return mixed
+     */
+    public function getReview(int $id, int $limit): mixed
+    {
+        $query = 'SELECT u.first_name, u.last_name, rh.rating, rh.review
+        FROM histories h
+             JOIN rating_histories rh USING (history_id)
+             JOIN users u USING (user_id)
+        WHERE h.book_id = %d
+        ORDER BY rh.created_at DESC
+        LIMIT %d';
+
+        return $this->db->query($query, $id, $limit);
+    }
+
     /**
      * Get book published year.
      *
@@ -358,7 +379,7 @@ class BookRepository extends BaseRepository
         $orderBy = columnValidation([
             'created_at',
         ], $payload['orderBy']) ?? 'created_at';
-        $orderType = columnValidation(['ASC', 'DESC'], $payload['orderType']) ?? 'ASC';
+        $orderType = columnValidation(['ASC', 'DESC'], $payload['orderType']) ?? 'DESC';
 
         return $this->db->query('SELECT book_id, title, slug, image, rating, stock, borrowed, published_at, created_at, deleted_at FROM books b WHERE %l ORDER BY %l %l LIMIT %d OFFSET %d', $condition, $orderBy, $orderType, $payload['count'], $payload['page'] * $payload['count']);
     }

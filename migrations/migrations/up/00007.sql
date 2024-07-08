@@ -57,7 +57,7 @@ CREATE TRIGGER au_histories
 BEGIN
     IF NEW.status = 'success' THEN
         UPDATE books SET borrowed = borrowed - 1, borrowed_count = borrowed_count + 1 WHERE book_id = OLD.book_id;
-        UPDATE users SET points = points + NEW.point WHERE user_id = OLD.user_id;
+        UPDATE users SET points = points + NEW.point, book_count = book_count + 1 WHERE user_id = OLD.user_id;
     END IF;
 
     IF NEW.status = 'cancel' THEN
